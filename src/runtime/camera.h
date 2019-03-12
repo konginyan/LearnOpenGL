@@ -9,6 +9,7 @@ namespace ace
         {
         private:
             ace::render::projection t_proj;
+            static glm::vec3 c_up;
 
         public:
             ace::render::transform t_trans;

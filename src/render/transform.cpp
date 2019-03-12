@@ -8,9 +8,8 @@ namespace ace
         transform::transform()
         {
             t_position = glm::mat4(1.0);
-            t_rotation = glm::quat();
+            t_rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
             t_scale = glm::mat4(1.0);
-            t_euler = glm::vec3();
         }
 
         transform::transform(const transform &trans)
@@ -18,7 +17,6 @@ namespace ace
             t_position = trans.t_position;
             t_rotation = trans.t_rotation;
             t_scale = trans.t_scale;
-            t_euler= trans.t_euler;
         }
         
         transform::~transform()
@@ -35,9 +33,9 @@ namespace ace
         void transform::rotate(float pitch, float yaw, float roll)
         {
             glm::vec3 euler(pitch, yaw, roll);
-            t_euler += euler;
+            euler = glm::radians(euler);
             glm::quat rot_quat = glm::quat(euler);
-            t_rotation = rot_quat * t_rotation;
+            t_rotation *= rot_quat;
         }
 
         // 叠加大小矩阵
@@ -55,7 +53,7 @@ namespace ace
 
         glm::vec3 transform::getRotation()
         {
-            return t_euler;
+            return glm::eulerAngles(t_rotation);
         }
 
         glm::vec3 transform::getScale()
@@ -67,7 +65,7 @@ namespace ace
         glm::mat4 transform::getTransform()
         {
             glm::mat4 rotate = glm::mat4_cast(t_rotation);
-            return t_scale * rotate * t_position;
+            return t_scale * t_position * rotate;
         }
 
         // 重置位移矩阵
@@ -81,7 +79,6 @@ namespace ace
         void transform::setRotation(float pitch, float yaw, float roll)
         {
             t_rotation = glm::quat();
-            t_euler = glm::vec3();
             rotate(pitch, yaw, roll);
         }
 

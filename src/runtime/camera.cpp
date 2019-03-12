@@ -4,6 +4,8 @@ namespace ace
 {
     namespace runtime
     {
+        glm::vec3 camera::c_up = glm::vec3(0.0f, 1.0f, 0.0f);
+
         camera::camera()
         {
         }

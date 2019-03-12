@@ -11,7 +11,6 @@ namespace ace
             glm::mat4 t_position;
             glm::quat t_rotation;
             glm::mat4 t_scale;
-            glm::vec3 t_euler;
 
         public:
             transform();

@@ -14,7 +14,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); mac
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // mac
 
     float screen_width = 800.0f;
     float screen_height = 600.0f;
@@ -36,24 +36,9 @@ int main()
 
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    // char* vx = "../../shader/base.vs";
-    // char* fx = "../../shader/base.fs";
-    // ace::render::shaderProgram sp(vx, fx);
-
-    // float vertices[] = {
-    //     0.5f, 0.5f, 0.0f,   // 右上角
-    //     0.5f, -0.5f, 0.0f,  // 右下角
-    //     -0.5f, -0.5f, 0.0f, // 左下角
-    //     -0.5f, 0.5f, 0.0f   // 左上角
-    // };
-
-    // ace::render::vertex vv(3);
-    // vv.setBuffer(sizeof(vertices), vertices);
-    // vv.setAttr(3);
-
-    ace::render::point p1 = {0.5f, 0.5f, 0.0f};
-    ace::render::point p2 = {0.5f, -0.5f, 0.0f};
-    ace::render::point p3 = {-0.5f, -0.5f, 0.0f};
+    ace::render::point p1 = {0.0f, 0.5f, 0.0f};
+    ace::render::point p2 = {0.25f, -0.5f, 0.0f};
+    ace::render::point p3 = {-0.25f, -0.5f, 0.0f};
 
     auto scn = new ace::runtime::scene();
 
@@ -68,10 +53,14 @@ int main()
 
     auto input_mgr = new ace::interaction::playerInput();
     input_mgr->link(GLFW_KEY_ESCAPE, "", [&window](){glfwSetWindowShouldClose(window, true);});
-    input_mgr->link(GLFW_KEY_W, "", [&cam](){cam->t_trans.translate(0.0f,0.0f,-1.0f);});
-    input_mgr->link(GLFW_KEY_S, "", [&cam](){cam->t_trans.translate(0.0f,0.0f,1.0f);});
-    input_mgr->link(GLFW_KEY_A, "", [&cam](){cam->t_trans.rotate(0.0f,0.3f,0.0f);});
-    input_mgr->link(GLFW_KEY_D, "", [&cam](){cam->t_trans.rotate(0.0f,-0.3f,0.0f);});
+    input_mgr->link(GLFW_KEY_W, "", [&cam](){cam->t_trans.rotate(1.0f,0.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_S, "", [&cam](){cam->t_trans.rotate(-1.0f,0.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_A, "", [&cam](){cam->t_trans.rotate(0.0f,1.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_D, "", [&cam](){cam->t_trans.rotate(0.0f,-1.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_UP, "", [&elm](){elm->t_trans.rotate(-1.0f,0.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_DOWN, "", [&elm](){elm->t_trans.rotate(1.0f,0.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_LEFT, "", [&elm](){elm->t_trans.rotate(0.0f,-1.0f,0.0f);});
+    input_mgr->link(GLFW_KEY_RIGHT, "", [&elm](){elm->t_trans.rotate(0.0f,1.0f,0.0f);});
 
     glfwSetWindowUserPointer(window, input_mgr);
 
