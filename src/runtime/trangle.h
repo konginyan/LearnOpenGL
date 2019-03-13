@@ -9,7 +9,7 @@ namespace ace
         {
         public:
             trangle(scene* scn, ace::render::point p1, ace::render::point p2, ace::render::point p3);
-            trangle(const trangle &t);
+            trangle(const trangle &elm);
             ~trangle();
 
             void render();

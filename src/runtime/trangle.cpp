@@ -24,7 +24,7 @@ namespace ace
             t_shader = new ace::render::shaderProgram("../../shader/base.vs", "../../shader/base.fs");
         }
 
-        trangle::trangle(const trangle &t):element(t)
+        trangle::trangle(const trangle &elm):element(elm)
         {
         }
         

@@ -1,6 +1,7 @@
 #include "interaction/player.h"
 #include "runtime/scene.h"
 #include "runtime/trangle.h"
+#include "runtime/cube.h"
 #include "runtime/camera.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -48,8 +49,8 @@ int main()
     scn->addCamera("main", cam);
     scn->setActiveCamera("main");
 
-    auto elm = new ace::runtime::trangle(scn, p1, p2, p3);
-    scn->addElement("trangle", elm);
+    auto elm = new ace::runtime::cube(scn, 0.5f, 0.5f, 0.5f);
+    scn->addElement("cube", elm);
 
     auto input_mgr = new ace::interaction::playerInput();
     input_mgr->link(GLFW_KEY_ESCAPE, "", [&window](){glfwSetWindowShouldClose(window, true);});
