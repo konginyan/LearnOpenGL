@@ -4,18 +4,13 @@ namespace ace
 {
     namespace runtime
     {
-        trangle::trangle(scene* scn, ace::render::point p1, ace::render::point p2, ace::render::point p3):element(scn)
+        trangle::trangle(scene* scn, ace::render::vec3 p1, ace::render::vec3 p2, ace::render::vec3 p3):element(scn)
         {
-            float v[9];
-            v[0] = p1.x;
-            v[1] = p1.y;
-            v[2] = p1.z;
-            v[3] = p2.x;
-            v[4] = p2.y;
-            v[5] = p2.z;
-            v[6] = p3.x;
-            v[7] = p3.y;
-            v[8] = p3.z;
+            float v[9] = {
+                p1.x, p1.y, p1.z,
+                p2.x, p2.y, p2.z,
+                p3.x, p3.y, p3.z
+            };
 
             t_vao = new ace::render::vertex(3);
             t_vao->setBuffer(sizeof(v), v);
@@ -43,9 +38,9 @@ namespace ace
             auto view_mat = active_camera->getViewMat();
             auto proj_mat = active_camera->getProj();
 
-            t_shader->setUniformMatrix4fv("model", 1, GL_FALSE, glm::value_ptr(model_mat));
-            t_shader->setUniformMatrix4fv("view", 1, GL_FALSE, glm::value_ptr(view_mat));
-            t_shader->setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(proj_mat));
+            t_shader->setUniformMatrix4fv("model", glm::value_ptr(model_mat));
+            t_shader->setUniformMatrix4fv("view", glm::value_ptr(view_mat));
+            t_shader->setUniformMatrix4fv("projection", glm::value_ptr(proj_mat));
 
             t_vao->bind();
             glDrawArrays(GL_TRIANGLES, 0, 3);

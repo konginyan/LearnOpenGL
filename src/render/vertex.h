@@ -5,10 +5,16 @@ namespace ace
 {
     namespace render
     {
-        struct point
+        struct vec3
         {
             float x, y, z;
         };
+
+        static float* vec2array(vec3 v)
+        {
+            float* f = new float[3]{v.x, v.y, v.z};
+            return f;
+        }
         
         class vertex
         {
@@ -30,7 +36,8 @@ namespace ace
             void setBuffer(int size, float* vertices);
             void setIndex(int size, unsigned int* indices);
             bool setAttr(int cnt);
-            void bind();
+            void clearAttr();
+            bool bind();
         };
     }// render
 }// ace

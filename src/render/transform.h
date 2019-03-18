@@ -29,13 +29,13 @@ namespace ace
             void setScale(float x, float y, float z);
         };
 
-        enum proj_type {ORTHO, PERSPECTIVE};
+        enum projType {ORTHO, PERSPECTIVE};
 
         class projection
         {
         private:
             glm::mat4 t_proj_mat;
-            proj_type t_proj_mode;
+            projType t_proj_mode;
 
         public:
             projection();

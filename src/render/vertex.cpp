@@ -61,7 +61,7 @@ namespace ace
             glBindVertexArray(t_vao);
             glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
             glVertexAttribPointer(t_attr_cnt, cnt, GL_FLOAT, GL_FALSE, t_per_size * sizeof(float), (void*)(t_attr_len* sizeof(float)));
-            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(t_attr_cnt);
             glBindVertexArray(0);
 
             t_attr_cnt ++;
@@ -69,9 +69,26 @@ namespace ace
             return true;
         }
 
-        void vertex::bind()
+        void vertex::clearAttr()
         {
             glBindVertexArray(t_vao);
+            for(int i=0;i<t_attr_cnt;i++)
+            {
+                glDisableVertexAttribArray(t_attr_cnt);
+            }
+            glBindVertexArray(0);
+            t_attr_cnt = 0;
+            t_attr_len = 0;
+        }
+
+        bool vertex::bind()
+        {
+            if(t_attr_cnt > 0)
+            {
+                glBindVertexArray(t_vao);
+                return true;
+            }
+            return false;
         }
     }// render
 }// ace

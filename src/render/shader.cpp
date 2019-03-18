@@ -7,10 +7,14 @@ namespace ace
     namespace render
     {
         // ----------- shader -------------
-        shader::shader(char* path, int type):t_type(type)
+        shader::shader(char* path, int type, shaderOption option):t_type(type)
         {
             std::string file_str = ace::utils::readFile(path);
+            int first_line_end = file_str.find_first_of("\n");
+            std::string options = option2macro(option);
+            file_str.insert(first_line_end + 1, options);
             const char* src_str = file_str.c_str();
+
             t_shader_id = glCreateShader(type);
             glShaderSource(t_shader_id, 1, &src_str, NULL);
             glCompileShader(t_shader_id);
@@ -58,9 +62,9 @@ namespace ace
             linkShader();
         }
 
-        shaderProgram::shaderProgram(char* vert, char* frag)
+        shaderProgram::shaderProgram(char* vert, char* frag, shaderOption option)
         {
-            shader vshader(vert, GL_VERTEX_SHADER);
+            shader vshader(vert, GL_VERTEX_SHADER, option);
             shader fshader(frag, GL_FRAGMENT_SHADER);
             t_vert_id = vshader.id();
             t_frag_id = fshader.id();

@@ -2,13 +2,12 @@
 #include "render/transform.h"
 #include "render/shader.h"
 #include "render/vertex.h"
+#include "scene.h"
 
 namespace ace
 {
     namespace runtime
     {
-        class scene;
-
         class element
         {
         protected:
@@ -23,6 +22,7 @@ namespace ace
             element(scene* scn);
             element(const element &elm);
             ~element();
+
             virtual void render() = 0;
         };
     }
