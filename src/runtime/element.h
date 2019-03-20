@@ -17,6 +17,12 @@ namespace ace
         public:
             ace::render::transform t_trans;
             ace::render::shaderProgram* t_shader;
+            ace::render::texture* t_tex;
+
+            float* t_vertices;
+            int t_vert_size;
+
+            ace::render::batch t_bat;
 
         public:
             element(scene* scn);

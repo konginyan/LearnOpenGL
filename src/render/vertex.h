@@ -15,6 +15,26 @@ namespace ace
             float* f = new float[3]{v.x, v.y, v.z};
             return f;
         }
+
+        enum vertexDataType {position, normal, texcoord2d};
+
+        static int vertexDataSize(int option)
+        {
+            switch (option)
+            {
+                case position:
+                    return 3;
+
+                case normal:
+                    return 3;
+
+                case texcoord2d:
+                    return 2;
+
+                default:
+                    return 0;
+            }
+        }
         
         class vertex
         {
@@ -22,6 +42,8 @@ namespace ace
             int t_per_size;
             int t_attr_cnt;
             int t_attr_len;
+            int t_buf_size;
+            int t_buf_capcity;
             GLuint t_vao;
             GLuint t_vbo;
             GLuint t_ebo;
@@ -32,12 +54,18 @@ namespace ace
             vertex(const vertex &v) = delete;
             ~vertex();
 
-            bool setSize(int size);
-            void setBuffer(int size, float* vertices);
-            void setIndex(int size, unsigned int* indices);
-            bool setAttr(int cnt);
-            void clearAttr();
-            bool bind();
+            bool setPerSize(int size); // 设置单个点大小
+            void setBuffer(int size, float* vertices); // 重新设置静态 buffer
+            void clearBuffer(int size); // 清除 buffer，生成固定大小的动态空 buffer
+            void appendBuffer(int size, float* vertices); // 向动态 buffer 添加数据
+            int drawArrayCount(); // 获取 drawArray 方法的顶点数
+
+            void setIndex(int size, unsigned int* indices); // 设置索引
+            bool setAttr(int cnt); // 添加并设置属性大小
+            void clearAttr(); // 删除所有属性
+            bool bind(); // 绑定 vao
+
+            inline GLuint id() {return t_vao;}
         };
-    }// render
-}// ace
+    }
+}

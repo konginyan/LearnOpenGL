@@ -13,5 +13,5 @@ namespace ace
                         std::istreambuf_iterator<char>());
             return str;
         }
-    }// render
-}// utils
+    }
+}

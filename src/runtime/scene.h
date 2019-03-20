@@ -2,15 +2,34 @@
 #include <map>
 #include <string>
 #include "camera.h"
-#include "render/vertex.h"
+#include "render/manager.h"
 
 namespace ace
 {
     namespace runtime
     {
+        class scene;
         class element;
         class light;
         enum lightType;
+
+        class renderer
+        {
+        private:
+            std::map<std::string, int> t_batches;
+            scene* t_scn;
+
+        public:
+            bool t_isbatch;
+
+        public:
+            renderer(scene* scn);
+            ~renderer();
+
+            void onRenderBegin();
+            void render(element* elm);
+            void onRenderEnd();
+        };
 
         class scene
         {
@@ -21,10 +40,11 @@ namespace ace
 
         public:
             std::map<std::string, light*> t_lights;
+            renderer t_render;
 
         public:
             scene();
-            scene(const scene &scn);
+            scene(const scene &scn) = delete;
             ~scene();
 
             void addElement(std::string name, element* elm);

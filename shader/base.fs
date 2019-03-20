@@ -30,13 +30,12 @@ struct Light {
     vec3 specular;
 };
 uniform Light light;
+uniform vec3 viewPos; // 相机世界坐标
 #endif
 
 #ifdef COLOR
 uniform vec3 objColor;
 #endif
-
-uniform vec3 viewPos; // 相机世界坐标
 
 in vec3 FragPos; // 着色点世界坐标
 

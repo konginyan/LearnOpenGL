@@ -39,11 +39,6 @@ namespace ace
             glDeleteShader(t_shader_id);
         }
 
-        GLuint shader::id()
-        {
-            return t_shader_id;
-        }
-
         int shader::is_loaded()
         {
             return t_succeed;
@@ -69,6 +64,7 @@ namespace ace
             t_vert_id = vshader.id();
             t_frag_id = fshader.id();
             t_program_id = glCreateProgram();
+            t_option = option;
             linkShader();
         }
 
@@ -107,6 +103,6 @@ namespace ace
         {
             glUseProgram(t_program_id);
         }
-    }// render
-}// ace
+    }
+}
 

@@ -62,8 +62,9 @@ namespace ace
             shader(const shader &s);
             ~shader();
 
-            GLuint id();
             int is_loaded();
+
+            inline GLuint id() {return t_shader_id;}
         };
 
         class shaderProgram
@@ -86,6 +87,8 @@ namespace ace
             int is_loaded();
             void use();
 
+            inline GLuint id() {return t_program_id;}
+
             DEFINE_UNIFORM_MATRIX(Matrix4fv); //setUniformMatrix4fv
             DEFINE_UNIFORM_VECTOR(2fv); // setUniform2fv
             DEFINE_UNIFORM_VECTOR(3fv); // setUniform3fv
@@ -97,5 +100,5 @@ namespace ace
                 glUniform1f(location, value);
             }
         };
-    }// render
-}// ace
+    }
+}

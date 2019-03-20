@@ -39,15 +39,24 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     auto scn = new ace::runtime::scene();
+    scn->t_render.t_isbatch = true;
 
-    auto elm = new ace::runtime::cube(scn, 0.5f, 0.5f, 0.5f);
-    scn->addElement("cube", elm);
+	auto base_shader = new ace::render::shaderProgram("../../../shader/base.vs", "../../../shader/base.fs");
+	ace::render::manager::base_shader_id = base_shader->id();
+	ace::render::manager::instance()->genShad(base_shader);
+	std::cout << "generate base shader: " << base_shader->id() << std::endl;
 
-    ace::render::vec3 amb = {0.2f, 0.2f, 0.2f};
-    ace::render::vec3 dif = {0.5f, 0.5f, 0.5f};
-    ace::render::vec3 spc = {1.0f, 1.0f, 1.0f};
-    auto lig = scn->addLight("light", ace::runtime::lightType::POINT, amb, dif, spc);
-    lig->t_trans.translate(3.0f, 3.0f, 3.0f);
+    ace::render::vec3 p1 = {-0.5f, -0.5f, 0.0f};
+    ace::render::vec3 p2 = {0.5f, -0.5f, 0.0f};
+    ace::render::vec3 p3 = {0.0f, 0.5f, 0.0f};
+    auto elm = new ace::runtime::trangle(scn, p1, p2, p3);
+    scn->addElement("t", elm);
+
+    // ace::render::vec3 amb = {0.2f, 0.2f, 0.2f};
+    // ace::render::vec3 dif = {0.5f, 0.5f, 0.5f};
+    // ace::render::vec3 spc = {1.0f, 1.0f, 1.0f};
+    // auto lig = scn->addLight("light", ace::runtime::lightType::POINT, amb, dif, spc);
+    // lig->t_trans.translate(3.0f, 3.0f, 3.0f);
 
     auto input_mgr = new ace::interaction::playerInput();
     input_mgr->link(GLFW_KEY_ESCAPE, "", [&window](){glfwSetWindowShouldClose(window, true);});

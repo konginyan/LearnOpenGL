@@ -8,7 +8,7 @@ namespace ace
          {
          }
 
-        vertex::vertex(int per_size):t_per_size(per_size),t_attr_cnt(0),t_attr_len(0)
+        vertex::vertex(int per_size):t_per_size(per_size),t_attr_cnt(0),t_attr_len(0),t_buf_size(0),t_buf_capcity(0)
         {
             glGenVertexArrays(1, &t_vao);
             glGenBuffers(1, &t_vbo);
@@ -22,7 +22,7 @@ namespace ace
             glDeleteBuffers(1, &t_ebo);
         }
 
-        bool vertex::setSize(int size)
+        bool vertex::setPerSize(int size)
         {
             if(t_attr_cnt > 0)
             {
@@ -39,6 +39,39 @@ namespace ace
             glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
+            t_buf_capcity = size;
+            t_buf_size = size;
+        }
+
+        void vertex::clearBuffer(int size)
+        {
+            glBindVertexArray(t_vao);
+            glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
+            glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            t_buf_capcity = size;
+            t_buf_size = 0;
+        }
+
+        void vertex::appendBuffer(int size, float* vertices)
+        {
+            if(t_buf_size + size > t_buf_capcity)
+            {
+                std::cout << "VBO Overflow!!" << std::endl;
+                return;
+            }
+            glBindVertexArray(t_vao);
+            glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, t_buf_size, size, vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            t_buf_size += size;
+        }
+
+        int vertex::drawArrayCount()
+        {
+            return t_buf_size / t_per_size * sizeof(float);
         }
 
         void vertex::setIndex(int size, unsigned int* indices)
@@ -90,5 +123,5 @@ namespace ace
             }
             return false;
         }
-    }// render
-}// ace
+    }
+}
