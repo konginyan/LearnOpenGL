@@ -68,11 +68,13 @@ namespace ace
 
             t_vao = new ace::render::vertex(6);
             t_vao->setBuffer(sizeof(v), v);
-            t_vao->setAttr(3);
-            t_vao->setAttr(3);
+            t_vao->setAttr(ace::render::vertexDataType::position);
+            t_vao->setAttr(ace::render::vertexDataType::normal);
             t_vao->setIndex(sizeof(idx), idx);
 
-            ace::render::shaderOption options = {false, true, false, true, true, false, false, false, false, false};
+            ace::render::shaderOption options = ace::render::default_shader_option;
+            options.NORMAL = true;
+            options.LIGHT = true;
             t_shader = new ace::render::shaderProgram("../../shader/base.vs", "../../shader/base.fs", options);
         }
 

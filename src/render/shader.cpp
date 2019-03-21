@@ -60,7 +60,7 @@ namespace ace
         shaderProgram::shaderProgram(char* vert, char* frag, shaderOption option)
         {
             shader vshader(vert, GL_VERTEX_SHADER, option);
-            shader fshader(frag, GL_FRAGMENT_SHADER);
+            shader fshader(frag, GL_FRAGMENT_SHADER, option);
             t_vert_id = vshader.id();
             t_frag_id = fshader.id();
             t_program_id = glCreateProgram();
@@ -94,7 +94,7 @@ namespace ace
             }
         }
 
-        int shaderProgram::is_loaded()
+        int shaderProgram::isLoaded()
         {
             return t_succeed;
         }

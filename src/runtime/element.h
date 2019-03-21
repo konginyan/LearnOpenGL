@@ -20,14 +20,16 @@ namespace ace
             ace::render::texture* t_tex;
 
             float* t_vertices;
+            float* t_real_vertices;
             int t_vert_size;
-
             ace::render::batch t_bat;
 
         public:
             element(scene* scn);
             element(const element &elm);
             ~element();
+
+            float* getVertices();
 
             virtual void render() = 0;
         };

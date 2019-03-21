@@ -12,7 +12,10 @@ namespace ace
             if(data)
             {
                 glBindTexture(GL_TEXTURE_2D, t_id);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                if(nrChannels == 3)
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                else
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             else
@@ -20,6 +23,12 @@ namespace ace
                 std::cout << "Failed to load texture: " << filename << std::endl;
             }
             stbi_image_free(data);
+        }
+
+        void texture::bind(int idx)
+        {
+            glActiveTexture(idx);
+            glBindTexture(GL_TEXTURE_2D, t_id);
         }
 
         texture::texture(const texture &tex)

@@ -69,10 +69,7 @@ namespace ace
         void scene::render()
         {
             t_render.onRenderBegin();
-            for(auto &elm: t_elements)
-            {
-                t_render.render(elm.second);
-            }
+            t_render.render();
             t_render.onRenderEnd();
         }
 
@@ -85,60 +82,73 @@ namespace ace
         {
         }
 
-        void renderer::onRenderBegin()
+        void renderer::makeBatch()
         {
             auto mgr = ace::render::manager::instance();
-            if(t_isbatch)
+            mgr->clearVert();
+            t_batches.clear();
+            for (auto &e : t_scn->t_elements)
             {
-                mgr->clearVert();
-                auto shader = mgr->getShad(ace::render::manager::base_shader_id);
-                shader->use();
-                auto active_camera = t_scn->getActiveCamera();
-                auto view_mat = active_camera->getViewMat();
-                auto proj_mat = active_camera->getProj();
-
-                shader->setUniformMatrix4fv("view", glm::value_ptr(view_mat));
-                shader->setUniformMatrix4fv("projection", glm::value_ptr(proj_mat));
-            }
-        }
-
-        void renderer::render(element* elm)
-        {
-            auto mgr = ace::render::manager::instance();
-            if(t_isbatch)
-            {
+                auto elm = e.second;
                 auto v = mgr->getVert(elm->t_bat.vert);
                 v->appendBuffer(elm->t_vert_size, elm->t_vertices);
 
                 auto batch_code = mgr->merge(elm->t_bat);
                 auto b = t_batches.find(batch_code);
-                if(b == t_batches.end())
+                if (b == t_batches.end())
                 {
                     t_batches[batch_code] = 0;
                 }
             }
-            else
-            {
-                elm->render();
-            }
         }
 
-        void renderer::onRenderEnd()
+        void renderer::onRenderBegin()
+        {
+            auto mgr = ace::render::manager::instance();
+            auto shader = mgr->getShad(ace::render::manager::base_shader_id);
+            shader->use();
+            auto active_camera = t_scn->getActiveCamera();
+            auto view_mat = active_camera->getViewMat();
+            auto proj_mat = active_camera->getProj();
+
+            shader->setUniformMatrix4fv("view", glm::value_ptr(view_mat));
+            shader->setUniformMatrix4fv("projection", glm::value_ptr(proj_mat));
+        }
+
+        void renderer::render()
         {
             auto mgr = ace::render::manager::instance();
             if(t_isbatch)
             {
-                for(auto &bat: t_batches)
+                for (auto &bat : t_batches)
                 {
                     ace::render::batch b = mgr->split(bat.first);
+                    mgr->getTex(b.tex)->bind(GL_TEXTURE0);
                     mgr->getShad(b.shad)->use();
                     auto v = mgr->getVert(b.vert);
                     v->bind();
                     glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
                 }
-
-                t_batches.clear();
             }
+            else
+            {
+                for (auto &e : t_scn->t_elements)
+                {
+                    auto elm = e.second;
+                    ace::render::batch b = elm->t_bat;
+                    mgr->getTex(b.tex)->bind(GL_TEXTURE0);
+                    mgr->getShad(b.shad)->use();
+                    auto v = mgr->getVert(b.vert);
+                    v->setBuffer(elm->t_vert_size, elm->t_vertices);
+                    v->bind();
+                    glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                }
+            }
+        }
+
+        void renderer::onRenderEnd()
+        {
+            
         }
     }
 }

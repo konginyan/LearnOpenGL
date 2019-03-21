@@ -83,8 +83,9 @@ namespace ace
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
 
-        bool vertex::setAttr(int cnt)
+        bool vertex::setAttr(vertexDataType attr_type)
         {
+            int cnt = vertexDataSize(attr_type);
             if(t_attr_len + cnt > t_per_size)
             {
                 std::cout << "set attribute error: vertexArray size overflow!" << std::endl;
@@ -93,8 +94,8 @@ namespace ace
 
             glBindVertexArray(t_vao);
             glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
-            glVertexAttribPointer(t_attr_cnt, cnt, GL_FLOAT, GL_FALSE, t_per_size * sizeof(float), (void*)(t_attr_len* sizeof(float)));
-            glEnableVertexAttribArray(t_attr_cnt);
+            glVertexAttribPointer(attr_type, cnt, GL_FLOAT, GL_FALSE, t_per_size * sizeof(float), (void*)(t_attr_len* sizeof(float)));
+            glEnableVertexAttribArray(attr_type);
             glBindVertexArray(0);
 
             t_attr_cnt ++;

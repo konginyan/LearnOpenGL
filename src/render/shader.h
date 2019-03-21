@@ -29,6 +29,7 @@ namespace ace
             bool NORMAL;
 
             bool LIGHT;
+            bool LIGHTMAP;
             bool L_DIRECTION;
             bool L_POINT;
             bool L_SPOT;
@@ -36,7 +37,7 @@ namespace ace
             bool CAST_SHADOW;
             bool RECV_SHADOW;
         };
-        static shaderOption default_option = {false, false, false, false, false, false, false};
+        static shaderOption default_shader_option = {false, false, false, false, false, false, false, false, false, false, false};
 
         static std::string option2macro(shaderOption option)
         {
@@ -58,7 +59,7 @@ namespace ace
             int t_type;
 
         public:
-            shader(char* path, int type, shaderOption option=default_option);
+            shader(char* path, int type, shaderOption option=default_shader_option);
             shader(const shader &s);
             ~shader();
 
@@ -79,12 +80,12 @@ namespace ace
         public:
             shaderProgram();
             shaderProgram(shader vert, shader frag);
-            shaderProgram(char* vert, char* frag, shaderOption option=default_option);
+            shaderProgram(char* vert, char* frag, shaderOption option=default_shader_option);
             shaderProgram(const shaderProgram &s);
             ~shaderProgram();
 
             void linkShader();
-            int is_loaded();
+            int isLoaded();
             void use();
 
             inline GLuint id() {return t_program_id;}

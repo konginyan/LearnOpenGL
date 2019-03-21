@@ -39,7 +39,7 @@ namespace ace
 
             t_vao = new ace::render::vertex(3);
             t_vao->setBuffer(sizeof(v), v);
-            t_vao->setAttr(3);
+            t_vao->setAttr(ace::render::vertexDataType::position);
             t_vao->setIndex(sizeof(idx), idx);
 
             t_shader = new ace::render::shaderProgram("../../shader/base.vs", "../../shader/base.fs");

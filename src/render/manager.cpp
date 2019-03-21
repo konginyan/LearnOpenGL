@@ -5,6 +5,7 @@ namespace ace
     namespace render
     {
         GLuint manager::base_shader_id = 0;
+        GLuint manager::base_texture_id = 0;
 
         manager::manager()
         {
@@ -14,7 +15,7 @@ namespace ace
         {
         }
 
-        GLuint manager::genVert(int cnt, int* types)
+        GLuint manager::genVert(int cnt, vertexDataType* types)
         {
             int key = 0;
             for(int i=0; i<cnt; i++)
@@ -36,11 +37,10 @@ namespace ace
             }
 
             auto v = new vertex(persize);
-            v->clearBuffer(max_buf_size);
+            v->clearBuffer();
             for(int i=0; i<cnt; i++)
             {
-                int attr_size = vertexDataSize(types[i]);
-                v->setAttr(attr_size);
+                v->setAttr(types[i]);
             }
 
             t_verts[key] = v;
@@ -52,7 +52,7 @@ namespace ace
         {
             for(auto &v: t_verts)
             {
-                v.second->clearBuffer(max_buf_size);
+                v.second->clearBuffer();
             }
         }
 

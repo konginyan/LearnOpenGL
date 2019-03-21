@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include "camera.h"
 #include "render/manager.h"
@@ -16,7 +16,7 @@ namespace ace
         class renderer
         {
         private:
-            std::map<std::string, int> t_batches;
+            std::unordered_map<std::string, int> t_batches;
             scene* t_scn;
 
         public:
@@ -26,20 +26,21 @@ namespace ace
             renderer(scene* scn);
             ~renderer();
 
+            void makeBatch();
             void onRenderBegin();
-            void render(element* elm);
+            void render();
             void onRenderEnd();
         };
 
         class scene
         {
         private:
-            std::map<std::string, element*> t_elements;
-            std::map<std::string, camera*> t_cameras;
+            std::unordered_map<std::string, camera*> t_cameras;
             std::string t_active_camera;
 
         public:
-            std::map<std::string, light*> t_lights;
+            std::unordered_map<std::string, element*> t_elements;
+            std::unordered_map<std::string, light*> t_lights;
             renderer t_render;
 
         public:

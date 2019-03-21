@@ -23,10 +23,9 @@ namespace ace
             std::unordered_map<GLuint, shaderProgram*> t_shads;
             std::unordered_map<GLuint, texture*> t_texs;
 
-            static const int max_buf_size = 1024 * sizeof(float);
-
         public:
             static GLuint base_shader_id;
+            static GLuint base_texture_id;
 
             static manager* instance() 
             {
@@ -38,7 +37,7 @@ namespace ace
             manager();
             ~manager();
 
-            GLuint genVert(int cnt, int* types);
+            GLuint genVert(int cnt, vertexDataType* types);
             GLuint genShad(shaderProgram* s) { t_shads[s->id()] = s; return s->id(); }
             GLuint genTex(texture* tex) { t_texs[tex->id()] = tex; return tex->id(); }
             vertex* getVert(GLuint idx) {return t_verts[idx];}
