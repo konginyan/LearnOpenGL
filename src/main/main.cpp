@@ -40,7 +40,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     auto scn = new ace::runtime::scene();
-    scn->t_render.t_isbatch = false;
+    scn->t_render.t_isbatch = true;
 
     ace::render::shaderOption options = ace::render::default_shader_option;
     options.TEXTURE = true;
@@ -59,12 +59,12 @@ int main()
     ace::render::vec3 p2 = {0.5f, -0.5f, 0.0f};
     ace::render::vec3 p3 = {0.0f, 0.5f, 0.0f};
     ace::runtime::trangle* elm;
-    char elm_name[30000];
-    for(int i=0; i<30000; i++)
+    char elm_name[10000];
+    for(int i=0; i<10000; i++)
     {
-        p1.z += 1;
-        p2.z += 1;
-        p3.z += 1;
+        //p1.z += 1;
+        //p2.z += 1;
+        //p3.z += 1;
         elm = new ace::runtime::trangle(scn, p1, p2, p3);
         sprintf(elm_name, "t%d", i);
         scn->addElement(elm_name, elm);
@@ -86,6 +86,7 @@ int main()
     input_mgr->link(GLFW_KEY_D, "", [&cam]() {cam->t_trans.translate(0.1f, 0.0f, 0.0f); });
     input_mgr->link(GLFW_KEY_LEFT, "", [&cam]() {cam->t_trans.rotate(0.0f, 0.6f, 0.0f); });
     input_mgr->link(GLFW_KEY_RIGHT, "", [&cam]() {cam->t_trans.rotate(0.0f, -0.6f, 0.0f); });
+    input_mgr->link(GLFW_KEY_E, "", [&elm]() {elm->t_trans.translate(0.1f, 0.0f, 0.0f); elm->update(); });
 
     glfwSetWindowUserPointer(window, input_mgr);
 
@@ -106,6 +107,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //scn->update();
         scn->render();
 
         // 交互前后帧（双缓冲）

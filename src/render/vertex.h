@@ -63,6 +63,7 @@ namespace ace
             void setBuffer(int size, float* vertices); // 重新设置静态 buffer
             void clearBuffer(int size = MAX_BUF_SIZE); // 清除 buffer，生成固定大小的动态空 buffer
             int appendBuffer(int size, float* vertices); // 向动态 buffer 添加数据
+            void modifyBuffer(int offset, int size, float* vertices); // 修改 buffer 中被定义过的数据
             int drawArrayCount(); // 获取 drawArray 方法的顶点数
 
             void setIndex(int size, unsigned int* indices); // 设置索引

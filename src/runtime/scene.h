@@ -56,6 +56,7 @@ namespace ace
             camera* getActiveCamera();
             element* operator[](std::string name);
 
+            void update();
             void render();
         };
     }

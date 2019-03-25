@@ -12,6 +12,7 @@ namespace ace
             trangle(const trangle &elm);
             ~trangle();
 
+            void update();
             void render();
         };
     }

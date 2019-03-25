@@ -83,6 +83,15 @@ namespace ace
             return start_size;
         }
 
+        void vertex::modifyBuffer(int offset, int size, float* vertices)
+        {
+            glBindVertexArray(t_vao);
+            glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, offset, size, vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+        }
+
         int vertex::drawArrayCount()
         {
             return t_buf_size / t_per_size * sizeof(float);

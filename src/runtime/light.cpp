@@ -57,6 +57,11 @@ namespace ace
         {
         }
 
+        void light::update()
+        {
+
+        }
+
         void light::render()
         {
             t_shader->use();

@@ -36,13 +36,13 @@ namespace ace
                 int offset = i % per_size;
                 switch (offset)
                 {
-                case 1:
+                case 0:
                     t_real_vertices[i] = t_vertices[i] + pos.x;
                     break;
-                case 2:
+                case 1:
                     t_real_vertices[i] = t_vertices[i] + pos.y;
                     break;
-                case 3:
+                case 2:
                     t_real_vertices[i] = t_vertices[i] + pos.z;
                     break;
                 default:

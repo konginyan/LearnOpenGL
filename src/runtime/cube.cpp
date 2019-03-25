@@ -86,6 +86,11 @@ namespace ace
         {
         }
 
+        void cube::update()
+        {
+
+        }
+
         void cube::render()
         {
             t_shader->use();

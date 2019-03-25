@@ -19,6 +19,7 @@ namespace ace
             light(const light &elm);
             ~light();
 
+            void update();
             void render();
         };
     }

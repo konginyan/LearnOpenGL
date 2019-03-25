@@ -12,6 +12,7 @@ namespace ace
             cube(const cube &elm);
             ~cube();
 
+            void update();
             void render();
         };
     }

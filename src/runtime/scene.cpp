@@ -66,6 +66,15 @@ namespace ace
             return t_elements[name];
         }
 
+        void scene::update()
+        {
+            for (auto &e : t_elements)
+            {
+                auto elm = e.second;
+                elm->update();
+            }
+        }
+
         void scene::render()
         {
             t_render.onRenderBegin();
