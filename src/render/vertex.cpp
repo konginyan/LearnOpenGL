@@ -8,11 +8,23 @@ namespace ace
          {
          }
 
-        vertex::vertex(int per_size):t_per_size(per_size),t_attr_cnt(0),t_attr_len(0),t_buf_size(0),t_buf_capcity(0)
+        vertex::vertex(int per_size):t_per_size(per_size),t_attr_len(0),t_buf_size(0),t_buf_capcity(0)
         {
             glGenVertexArrays(1, &t_vao);
             glGenBuffers(1, &t_vbo);
             glGenBuffers(1, &t_ebo);
+        }
+
+        vertex::vertex(const vertex &v):t_per_size(v.t_per_size), t_attr_len(0), t_buf_size(0)
+        {
+            glGenVertexArrays(1, &t_vao);
+            glGenBuffers(1, &t_vbo);
+            glGenBuffers(1, &t_ebo);
+            for (auto &attr : v.t_attr_cnt)
+            {
+                setAttr(attr);
+            }
+            clearBuffer(v.t_buf_capcity);
         }
         
         vertex::~vertex()
@@ -24,7 +36,7 @@ namespace ace
 
         bool vertex::setPerSize(int size)
         {
-            if(t_attr_cnt > 0)
+            if(t_attr_cnt.size() > 0)
             {
                 return false;
             }
@@ -54,19 +66,21 @@ namespace ace
             t_buf_size = 0;
         }
 
-        void vertex::appendBuffer(int size, float* vertices)
+        int vertex::appendBuffer(int size, float* vertices)
         {
             if(t_buf_size + size > t_buf_capcity)
             {
                 std::cout << "VBO Overflow!!" << std::endl;
-                return;
+                return -1;
             }
             glBindVertexArray(t_vao);
             glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
             glBufferSubData(GL_ARRAY_BUFFER, t_buf_size, size, vertices);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
+            int start_size = t_buf_size;
             t_buf_size += size;
+            return start_size;
         }
 
         int vertex::drawArrayCount()
@@ -98,7 +112,7 @@ namespace ace
             glEnableVertexAttribArray(attr_type);
             glBindVertexArray(0);
 
-            t_attr_cnt ++;
+            t_attr_cnt.push_back(attr_type);
             t_attr_len += cnt;
             return true;
         }
@@ -106,18 +120,18 @@ namespace ace
         void vertex::clearAttr()
         {
             glBindVertexArray(t_vao);
-            for(int i=0;i<t_attr_cnt;i++)
+            for (auto &attr : t_attr_cnt)
             {
-                glDisableVertexAttribArray(t_attr_cnt);
+                glDisableVertexAttribArray(attr);
             }
             glBindVertexArray(0);
-            t_attr_cnt = 0;
+            t_attr_cnt.clear();
             t_attr_len = 0;
         }
 
         bool vertex::bind()
         {
-            if(t_attr_cnt > 0)
+            if(t_attr_cnt.size() > 0)
             {
                 glBindVertexArray(t_vao);
                 return true;

@@ -28,7 +28,7 @@ namespace ace
             }
             
             auto mgr = ace::render::manager::instance();
-            auto per_size = mgr->getVert(t_bat.vert)->getPerSize();
+            auto per_size = mgr->getVert(t_bat.vert, t_bat.vert_part)->getPerSize();
             auto pos = t_trans.getPosition();
             int v_len = t_vert_size / sizeof(float);
             for (int i=0; i< v_len; i++)

@@ -21,6 +21,7 @@ namespace ace
 
         public:
             bool t_isbatch;
+            int t_drawcall;
 
         public:
             renderer(scene* scn);

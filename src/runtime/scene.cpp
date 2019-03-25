@@ -74,7 +74,7 @@ namespace ace
         }
 
         // ============= renderer ===================
-        renderer::renderer(scene* scn):t_isbatch(false),t_scn(scn)
+        renderer::renderer(scene* scn):t_isbatch(false),t_scn(scn),t_drawcall(0)
         {
         }
         
@@ -84,14 +84,32 @@ namespace ace
 
         void renderer::makeBatch()
         {
+            if (!t_isbatch)
+                return;
+
             auto mgr = ace::render::manager::instance();
             mgr->clearVert();
             t_batches.clear();
             for (auto &e : t_scn->t_elements)
             {
                 auto elm = e.second;
-                auto v = mgr->getVert(elm->t_bat.vert);
-                v->appendBuffer(elm->t_vert_size, elm->t_vertices);
+                int v_cnt = mgr->getVertCount(elm->t_bat.vert);
+                auto v = mgr->getVert(elm->t_bat.vert, v_cnt);
+                int start_size = v->appendBuffer(elm->t_vert_size, elm->t_vertices);
+
+                if (start_size == -1)
+                {
+                    v_cnt = mgr->genVert(elm->t_bat.vert);
+                    v = mgr->getVert(elm->t_bat.vert, v_cnt);
+                    v->appendBuffer(elm->t_vert_size, elm->t_vertices);
+                    elm->t_bat.vert_part = v_cnt;
+                    elm->t_bat.vert_start = 0;
+                }
+                else
+                {
+                    elm->t_bat.vert_part = v_cnt;
+                    elm->t_bat.vert_start = start_size;
+                }
 
                 auto batch_code = mgr->merge(elm->t_bat);
                 auto b = t_batches.find(batch_code);
@@ -99,11 +117,17 @@ namespace ace
                 {
                     t_batches[batch_code] = 0;
                 }
+                else
+                {
+                    t_batches[batch_code] = v_cnt;
+                }
             }
         }
 
         void renderer::onRenderBegin()
         {
+            t_drawcall = 0;
+
             auto mgr = ace::render::manager::instance();
             auto shader = mgr->getShad(ace::render::manager::base_shader_id);
             shader->use();
@@ -122,12 +146,16 @@ namespace ace
             {
                 for (auto &bat : t_batches)
                 {
-                    ace::render::batch b = mgr->split(bat.first);
-                    mgr->getTex(b.tex)->bind(GL_TEXTURE0);
-                    mgr->getShad(b.shad)->use();
-                    auto v = mgr->getVert(b.vert);
-                    v->bind();
-                    glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                    for (int i = 0; i <= bat.second; i++)
+                    {
+                        ace::render::batch b = mgr->split(bat.first);
+                        mgr->getTex(b.tex)->bind(GL_TEXTURE0);
+                        mgr->getShad(b.shad)->use();
+                        auto v = mgr->getVert(b.vert, i);
+                        v->bind();
+                        glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                        t_drawcall++;
+                    }
                 }
             }
             else
@@ -138,10 +166,11 @@ namespace ace
                     ace::render::batch b = elm->t_bat;
                     mgr->getTex(b.tex)->bind(GL_TEXTURE0);
                     mgr->getShad(b.shad)->use();
-                    auto v = mgr->getVert(b.vert);
+                    auto v = mgr->getVert(b.vert, b.vert_part);
                     v->setBuffer(elm->t_vert_size, elm->t_vertices);
                     v->bind();
                     glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                    t_drawcall++;
                 }
             }
         }

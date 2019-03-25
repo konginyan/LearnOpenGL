@@ -43,16 +43,24 @@ namespace ace
                 v->setAttr(types[i]);
             }
 
-            t_verts[key] = v;
-
+            t_verts[key] = std::vector<vertex*>();
+            t_verts[key].push_back(v);
             return key;
+        }
+
+        GLuint manager::genVert(GLuint idx)
+        {
+            auto new_v = new ace::render::vertex(*t_verts[idx][0]);
+            t_verts[idx].push_back(new_v);
+            auto cnt = getVertCount(idx);
+            return cnt;
         }
 
         void manager::clearVert()
         {
             for(auto &v: t_verts)
             {
-                v.second->clearBuffer();
+                v.second[0]->clearBuffer();
             }
         }
 

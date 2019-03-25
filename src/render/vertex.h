@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "glSupport.h"
 
 namespace ace
@@ -39,8 +40,8 @@ namespace ace
         class vertex
         {
         private:
+            std::vector<vertexDataType> t_attr_cnt;
             int t_per_size;
-            int t_attr_cnt;
             int t_attr_len;
             int t_buf_size;
             int t_buf_capcity;
@@ -49,19 +50,19 @@ namespace ace
             GLuint t_ebo;
 
         public:
-            static const int max_buf_size = 60000 * 15 * sizeof(float);
+            static const int MAX_BUF_SIZE = 1024 * 15 * sizeof(float);
 
         public:
             vertex();
             vertex(int per_size);
-            vertex(const vertex &v) = delete;
+            vertex(const vertex &v);
             ~vertex();
 
             int getPerSize() { return t_per_size; }
             bool setPerSize(int size); // 设置单个点大小
             void setBuffer(int size, float* vertices); // 重新设置静态 buffer
-            void clearBuffer(int size=max_buf_size); // 清除 buffer，生成固定大小的动态空 buffer
-            void appendBuffer(int size, float* vertices); // 向动态 buffer 添加数据
+            void clearBuffer(int size = MAX_BUF_SIZE); // 清除 buffer，生成固定大小的动态空 buffer
+            int appendBuffer(int size, float* vertices); // 向动态 buffer 添加数据
             int drawArrayCount(); // 获取 drawArray 方法的顶点数
 
             void setIndex(int size, unsigned int* indices); // 设置索引

@@ -23,7 +23,7 @@ namespace ace
             GLuint vert = mgr->genVert(2, types);
             delete types;
 
-            t_bat = {vert, mgr->base_shader_id, mgr->base_texture_id};
+            t_bat = {vert, 0, 0, mgr->base_shader_id, mgr->base_texture_id};
 
             ////////////////////////////////////////////////////
             //float v[] = {

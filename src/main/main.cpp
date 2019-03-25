@@ -40,7 +40,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     auto scn = new ace::runtime::scene();
-    scn->t_render.t_isbatch = true;
+    scn->t_render.t_isbatch = false;
 
     ace::render::shaderOption options = ace::render::default_shader_option;
     options.TEXTURE = true;
@@ -114,7 +114,7 @@ int main()
 
         end = std::clock();
         auto duration = (float)(end - start) / CLOCKS_PER_SEC;
-        std::cout << "frame rate: " << 1.0f / duration << std::endl;
+        std::cout << "frame rate: " << 1.0f / duration << "  drawcall time: " << scn->t_render.t_drawcall << std::endl;
     }
 
     glfwTerminate();
