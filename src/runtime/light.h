@@ -1,23 +1,24 @@
+#include <unordered_map>
 #include "element.h"
 
 namespace ace
 {
     namespace runtime
     {
-        enum lightType {DIERCT, POINT, SPOT};
+        enum lightType {DIRECT, POINT, SPOT};
 
         class light: public element
         {
         public:
-            ace::render::vec3 t_ambient;
-            ace::render::vec3 t_diffuse;
-            ace::render::vec3 t_specular;
+            std::unordered_map<char*, uniform> t_light_uniforms;
             lightType t_type;
 
         public:
-            light(scene* scn, lightType lt, ace::render::vec3 ambient, ace::render::vec3 diffuse, ace::render::vec3 specular);
-            light(const light &elm);
+            light(scene* scn, lightType lt);
+            light(const light &elm) = delete;
             ~light();
+
+            void setLightUniform(char* name, ace::render::uniformType utype, const float* val);
 
             void update();
             void render();

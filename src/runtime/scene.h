@@ -51,7 +51,7 @@ namespace ace
 
             void addElement(std::string name, element* elm);
             camera* addCamera(std::string name);
-            light* addLight(std::string name, lightType lt, ace::render::vec3 ambient, ace::render::vec3 diffuse, ace::render::vec3 specular);
+            light* addLight(std::string name, lightType lt);
             void setActiveCamera(std::string name);
             camera* getActiveCamera();
             element* operator[](std::string name);

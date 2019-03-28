@@ -44,10 +44,11 @@ namespace ace
             return cam;
         }
 
-        light* scene::addLight(std::string name, lightType lt, ace::render::vec3 ambient, ace::render::vec3 diffuse, ace::render::vec3 specular)
+        light* scene::addLight(std::string name, lightType lt)
         {
-            auto lig = new light(this, lt, ambient, diffuse, specular);
+            auto lig = new light(this, lt);
             t_lights[name] = lig;
+            t_elements[name] = lig;
             return lig;
         }
 
@@ -138,14 +139,17 @@ namespace ace
             t_drawcall = 0;
 
             auto mgr = ace::render::manager::instance();
-            auto shader = mgr->getShad(ace::render::manager::base_shader_id);
-            shader->use();
-            auto active_camera = t_scn->getActiveCamera();
-            auto view_mat = active_camera->getViewMat();
-            auto proj_mat = active_camera->getProj();
+            for (auto &shad_pair : mgr->t_shads)
+            {
+                auto shad = shad_pair.second;
+                shad->use();
+                auto active_camera = t_scn->getActiveCamera();
+                auto view_mat = active_camera->getViewMat();
+                auto proj_mat = active_camera->getProj();
 
-            shader->setUniformMatrix4fv("view", glm::value_ptr(view_mat));
-            shader->setUniformMatrix4fv("projection", glm::value_ptr(proj_mat));
+                shad->setUniformMatrix4fv("view", glm::value_ptr(view_mat));
+                shad->setUniformMatrix4fv("projection", glm::value_ptr(proj_mat));
+            }
         }
 
         void renderer::render()
@@ -158,7 +162,6 @@ namespace ace
                     for (int i = 0; i <= bat.second; i++)
                     {
                         ace::render::batch b = mgr->split(bat.first);
-                        mgr->getTex(b.tex)->bind(GL_TEXTURE0);
                         mgr->getShad(b.shad)->use();
                         auto v = mgr->getVert(b.vert, i);
                         v->bind();
@@ -173,12 +176,42 @@ namespace ace
                 {
                     auto elm = e.second;
                     ace::render::batch b = elm->t_bat;
-                    mgr->getTex(b.tex)->bind(GL_TEXTURE0);
-                    mgr->getShad(b.shad)->use();
+
+                    auto shad = mgr->getShad(b.shad);
+                    shad->use();
+
+                    // 光照 shader 参数
+                    if (shad->t_option.LIGHT)
+                    {
+                        shad->setUniform("viewPos", ace::render::m3fv, glm::value_ptr(t_scn->getActiveCamera()->t_trans.getPosition()));
+                        for (auto &lig : t_scn->t_lights)
+                        {
+                            for (auto &uf: lig.second->t_light_uniforms)
+                            {
+                                shad->setUniform(uf.first, uf.second.utype, uf.second.values);
+                            }
+                        }
+                    }
+
+                    // 物体 shader 参数
+                    for (auto &uf : elm->t_uniforms)
+                    {
+                        shad->setUniform(uf.first, uf.second.utype, uf.second.values);
+                    }
+
                     auto v = mgr->getVert(b.vert, b.vert_part);
-                    v->setBuffer(elm->t_vert_size, elm->t_vertices);
-                    v->bind();
-                    glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                    v->setBuffer(elm->t_vert_size, elm->getVertices());
+                    if (elm->t_idx_size > 0)
+                    {
+                        v->setIndex(elm->t_idx_size, elm->t_indices);
+                        v->bind();
+                        glDrawElements(GL_TRIANGLES, v->drawElementCount(), GL_UNSIGNED_INT, 0);
+                    }
+                    else
+                    {
+                        v->bind();
+                        glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+                    }
                     t_drawcall++;
                 }
             }

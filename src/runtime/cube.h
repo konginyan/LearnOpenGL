@@ -9,7 +9,7 @@ namespace ace
         {
         public:
             cube(scene* scn, float length, float width, float height);
-            cube(const cube &elm);
+            cube(const cube &elm) = delete;
             ~cube();
 
             void update();

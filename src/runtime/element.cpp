@@ -4,25 +4,26 @@ namespace ace
 {
     namespace runtime
     {
-        element::element(scene* scn):t_scn(scn)
+        element::element(scene* scn):t_scn(scn), t_vert_size(0), t_idx_size(0),t_bat({0,0,0,0,0})
         {
-        }
-
-        element::element(const element &elm)
-        {
-            t_trans = elm.t_trans;
-            t_shader = elm.t_shader;
-            t_scn = elm.t_scn;
-            t_vao = elm.t_vao;
         }
         
         element::~element()
         {
+            delete t_vertices;
+            delete t_real_vertices;
+            delete t_indices;
+        }
+
+        void element::setUniform(char* name, ace::render::uniformType utype, const float* val)
+        {
+            uniform uf = { utype, val };
+            t_uniforms[name] = uf;
         }
 
         float* element::getVertices()
         {
-            if (t_bat.vert % 10 == 1)
+            if (t_bat.vert % 2 != 1)
             {
                 return t_vertices;
             }

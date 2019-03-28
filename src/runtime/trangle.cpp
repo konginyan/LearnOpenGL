@@ -21,19 +21,12 @@ namespace ace
                 ace::render::vertexDataType::texcoord2d
             };
             GLuint vert = mgr->genVert(2, types);
+            t_bat.vert = vert;
             delete types;
-
-            t_bat = {vert, 0, 0, mgr->base_shader_id, mgr->base_texture_id};
-        }
-
-        trangle::trangle(const trangle &elm):element(elm)
-        {
         }
         
         trangle::~trangle()
         {
-            delete t_vao;
-            delete t_shader;
         }
 
         void trangle::update()

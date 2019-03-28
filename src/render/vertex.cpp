@@ -8,14 +8,14 @@ namespace ace
          {
          }
 
-        vertex::vertex(int per_size):t_per_size(per_size),t_attr_len(0),t_buf_size(0),t_buf_capcity(0)
+        vertex::vertex(int per_size):t_per_size(per_size),t_attr_len(0),t_buf_size(0),t_buf_capcity(0),t_idx_size(0)
         {
             glGenVertexArrays(1, &t_vao);
             glGenBuffers(1, &t_vbo);
             glGenBuffers(1, &t_ebo);
         }
 
-        vertex::vertex(const vertex &v):t_per_size(v.t_per_size), t_attr_len(0), t_buf_size(0)
+        vertex::vertex(const vertex &v):t_per_size(v.t_per_size), t_attr_len(0), t_buf_size(0), t_idx_size(0)
         {
             glGenVertexArrays(1, &t_vao);
             glGenBuffers(1, &t_vbo);
@@ -97,13 +97,19 @@ namespace ace
             return t_buf_size / t_per_size * sizeof(float);
         }
 
-        void vertex::setIndex(int size, unsigned int* indices)
+        int vertex::drawElementCount()
+        {
+            return t_idx_size / sizeof(int);
+        }
+
+        void vertex::setIndex(int size, int* indices)
         {
             glBindVertexArray(t_vao);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, t_ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_DYNAMIC_DRAW);
             glBindVertexArray(0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            t_idx_size = size;
         }
 
         bool vertex::setAttr(vertexDataType attr_type)

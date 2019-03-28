@@ -74,6 +74,7 @@ namespace ace
             t_frag_id = s.t_frag_id;
             t_program_id = s.t_program_id;
             t_succeed = s.t_succeed;
+            t_option = s.t_option;
         }
 
         shaderProgram::~shaderProgram()

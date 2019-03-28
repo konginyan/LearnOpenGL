@@ -11,11 +11,12 @@ layout (location = 2) in vec2 aTexCoords;
 out vec2 TexCoords;
 #endif
 
-out vec3 FragPos;
-
-#ifdef NORMAL
-uniform mat4 model;
+#ifdef LIGHT
+layout (location = 2) in vec2 aTexCoords;
+out vec2 TexCoords;
 #endif
+
+out vec3 FragPos;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -26,10 +27,14 @@ void main()
     FragPos = aPos;
 
     #ifdef NORMAL
-    Normal = mat3(transpose(inverse(model))) * aNormal;
+    Normal = aNormal;
     #endif
 
     #ifdef TEXTURE
+    TexCoords = aTexCoords;
+    #endif
+
+    #ifdef LIGHT
     TexCoords = aTexCoords;
     #endif
 }

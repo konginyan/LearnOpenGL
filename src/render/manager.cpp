@@ -4,9 +4,6 @@ namespace ace
 {
     namespace render
     {
-        GLuint manager::base_shader_id = 0;
-        GLuint manager::base_texture_id = 0;
-
         manager::manager()
         {
         }
@@ -54,6 +51,22 @@ namespace ace
             t_verts[idx].push_back(new_v);
             auto cnt = getVertCount(idx);
             return cnt;
+        }
+
+        GLuint manager::genShad(char* vert, char* frag, shaderOption option)
+        {
+            auto shad = new shaderProgram(vert, frag, option);
+            auto id = shad->id();
+            t_shads[id] = shad;
+            return id;
+        }
+
+        GLuint manager::genTex(char* filename)
+        {
+            auto tex = new texture(filename);
+            auto id = tex->id();
+            t_texs[id] = tex;
+            return id;
         }
 
         void manager::clearVert()

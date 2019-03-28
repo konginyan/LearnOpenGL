@@ -17,6 +17,18 @@ namespace ace
             return f;
         }
 
+        static float* float2array(float f1)
+        {
+            float* f = new float[1]{ f1 };
+            return f;
+        }
+
+        static float* float2array(float f1, float f2, float f3)
+        {
+            float* f = new float[3]{ f1,f2,f3 };
+            return f;
+        }
+
         enum vertexDataType {position, normal, texcoord2d};
 
         static int vertexDataSize(vertexDataType option)
@@ -45,6 +57,7 @@ namespace ace
             int t_attr_len;
             int t_buf_size;
             int t_buf_capcity;
+            int t_idx_size;
             GLuint t_vao;
             GLuint t_vbo;
             GLuint t_ebo;
@@ -65,8 +78,9 @@ namespace ace
             int appendBuffer(int size, float* vertices); // 向动态 buffer 添加数据
             void modifyBuffer(int offset, int size, float* vertices); // 修改 buffer 中被定义过的数据
             int drawArrayCount(); // 获取 drawArray 方法的顶点数
+            int drawElementCount(); // 获取 drawElement 方法的顶点数
 
-            void setIndex(int size, unsigned int* indices); // 设置索引
+            void setIndex(int size, int* indices); // 设置索引
             bool setAttr(vertexDataType attr_type); // 添加并设置属性大小
             void clearAttr(); // 删除所有属性
             bool bind(); // 绑定 vao

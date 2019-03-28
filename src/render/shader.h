@@ -1,26 +1,46 @@
 #pragma once
+#include <sstream>
 #include "glSupport.h"
 
-#define DEFINE_UNIFORM_VECTOR(type) \
-    void setUniform##type(char* name, const GLfloat *value) \
+#define DEFINE_UNIFORM_FLOAT(type) \
+    void setUnifor##type(char* name, const GLfloat* value) \
     { \
         GLuint location = glGetUniformLocation(t_program_id, name); \
-        glUniform##type(location, 1, value); \
+        glUnifor##type(location, *value); \
+    }
+
+#define DEFINE_UNIFORM_VECTOR(type) \
+    void setUnifor##type(char* name, const GLfloat *value) \
+    { \
+        GLuint location = glGetUniformLocation(t_program_id, name); \
+        glUnifor##type(location, 1, value); \
     }
 
 #define DEFINE_UNIFORM_MATRIX(type) \
-    void setUniform##type(char* name, const GLfloat *value) \
+    void setUnifor##type(char* name, const GLfloat *value) \
     { \
         GLuint location = glGetUniformLocation(t_program_id, name); \
-        glUniform##type(location, 1, GL_FALSE, value); \
+        glUnifor##type(location, 1, GL_FALSE, value); \
     }
 
-#define MARCOIZE(option) "#define " #option "\n"
+#define UNIFORM_SET(type, name, value) setUnifor##type(name, value)
+
+#define MARCOIZE(option) "#define " #option
 
 namespace ace
 {
     namespace render
     {
+        enum uniformType
+        {
+            mMatrix4fv,
+            m2fv,
+            m3fv,
+            m4fv,
+            m1f,
+            m1i
+        };
+
         struct shaderOption
         {
             bool COLOR;
@@ -29,26 +49,29 @@ namespace ace
             bool NORMAL;
 
             bool LIGHT;
-            bool LIGHTMAP;
-            bool L_DIRECTION;
-            bool L_POINT;
-            bool L_SPOT;
+            int L_DIRECTION;
+            int L_POINT;
+            int L_SPOT;
 
             bool CAST_SHADOW;
             bool RECV_SHADOW;
         };
-        static shaderOption default_shader_option = {false, false, false, false, false, false, false, false, false, false, false};
+        static shaderOption default_shader_option = {false, false, false, false, false, 0, 0, 0, false, false};
 
         static std::string option2macro(shaderOption option)
         {
-            std::string marcos("");
-            if(option.COLOR) marcos.append(MARCOIZE(COLOR));
-            if(option.TEXTURE) marcos.append(MARCOIZE(TEXTURE));
-            if(option.LIGHT) marcos.append(MARCOIZE(LIGHT));
-            if(option.NORMAL) marcos.append(MARCOIZE(NORMAL));
-            if(option.CAST_SHADOW) marcos.append(MARCOIZE(CAST_SHADOW));
-            if(option.RECV_SHADOW) marcos.append(MARCOIZE(RECV_SHADOW));
-            return marcos;
+            std::ostringstream marcos;
+            if(option.COLOR) marcos << MARCOIZE(COLOR) << "\n";
+            if(option.TEXTURE) marcos << MARCOIZE(TEXTURE) << "\n";
+            if(option.NORMAL) marcos << MARCOIZE(NORMAL) << "\n";
+            if(option.LIGHT) marcos << MARCOIZE(LIGHT) << "\n";
+            if(option.CAST_SHADOW) marcos << MARCOIZE(CAST_SHADOW) << "\n";
+            if(option.RECV_SHADOW) marcos << MARCOIZE(RECV_SHADOW) << "\n";
+
+            marcos << MARCOIZE(L_DIRECTION) << " " << option.L_DIRECTION << "\n";
+            marcos << MARCOIZE(L_POINT) << " " << option.L_POINT << "\n";
+            marcos << MARCOIZE(L_SPOT) << " " << option.L_SPOT << "\n";
+            return marcos.str();
         }
 
         class shader
@@ -75,6 +98,8 @@ namespace ace
             GLuint t_vert_id;
             GLuint t_frag_id;
             int t_succeed;
+           
+        public:
             shaderOption t_option;
 
         public:
@@ -90,15 +115,35 @@ namespace ace
 
             inline GLuint id() {return t_program_id;}
 
-            DEFINE_UNIFORM_MATRIX(Matrix4fv); //setUniformMatrix4fv
-            DEFINE_UNIFORM_VECTOR(2fv); // setUniform2fv
-            DEFINE_UNIFORM_VECTOR(3fv); // setUniform3fv
-            DEFINE_UNIFORM_VECTOR(4fv); // setUniform4fv
-            
-            void setUniform1f(char* name, GLfloat value)
+            DEFINE_UNIFORM_MATRIX(mMatrix4fv); //setUniformMatrix4fv
+            DEFINE_UNIFORM_VECTOR(m2fv); // setUniform2fv
+            DEFINE_UNIFORM_VECTOR(m3fv); // setUniform3fv
+            DEFINE_UNIFORM_VECTOR(m4fv); // setUniform4fv
+            DEFINE_UNIFORM_FLOAT(m1f); // setUniform1f
+            DEFINE_UNIFORM_FLOAT(m1i); // setUniform1i
+
+            void setUniform(char* name, uniformType utype, const float* value)
             {
-                GLuint location = glGetUniformLocation(t_program_id, name);
-                glUniform1f(location, value);
+                switch (utype)
+                {
+                case mMatrix4fv:
+                    UNIFORM_SET(mMatrix4fv, name, value);
+                    break;
+                case m2fv:
+                    UNIFORM_SET(m2fv, name, value);
+                    break;
+                case m3fv:
+                    UNIFORM_SET(m3fv, name, value);
+                    break;
+                case m4fv:
+                    UNIFORM_SET(m4fv, name, value);
+                    break;
+                case m1f:
+                    UNIFORM_SET(m1f, name, value);
+                    break;
+                default:
+                    break;
+                }
             }
         };
     }

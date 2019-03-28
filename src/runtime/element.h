@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include "render/transform.h"
 #include "render/shader.h"
 #include "render/vertex.h"
@@ -8,27 +9,35 @@ namespace ace
 {
     namespace runtime
     {
+        struct uniform
+        {
+            ace::render::uniformType utype;
+            const float* values;
+        };
+
         class element
         {
         protected:
             scene* t_scn;
-            ace::render::vertex* t_vao;
 
         public:
             ace::render::transform t_trans;
-            ace::render::shaderProgram* t_shader;
-            ace::render::texture* t_tex;
+            ace::render::batch t_bat;
 
             float* t_vertices;
             float* t_real_vertices;
             int t_vert_size;
-            ace::render::batch t_bat;
+            int* t_indices;
+            int t_idx_size;
+
+            std::unordered_map<char*, uniform> t_uniforms;
 
         public:
             element(scene* scn);
-            element(const element &elm);
+            element(const element &elm) = delete;
             ~element();
 
+            void setUniform(char* name, ace::render::uniformType utype, const float* val);
             float* getVertices();
 
             virtual void update() = 0;
