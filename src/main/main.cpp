@@ -1,5 +1,6 @@
 #include <ctime>
 #include "interaction/player.h"
+#include "interaction/log.h"
 #include "runtime/scene.h"
 #include "runtime/trangle.h"
 #include "runtime/cube.h"
@@ -27,7 +28,7 @@ int main()
     GLFWwindow* window = glfwCreateWindow(screen_width, screen_height, "Ace Engine", NULL, NULL);
     if (window == NULL)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        LOG_DEFAULT("Failed to create GLFW window\n");
         glfwTerminate();
         return -1;
     }
@@ -35,7 +36,7 @@ int main()
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        LOG_DEFAULT("Failed to initialize GLAD\n");
         return -1;
     }
 
@@ -109,13 +110,14 @@ int main()
     auto cam = scn->getActiveCamera();
     auto input_mgr = new ace::interaction::playerInput();
     input_mgr->link(GLFW_KEY_ESCAPE, "", [&window](){glfwSetWindowShouldClose(window, true);});
-    input_mgr->link(GLFW_KEY_W, "", [&cam]() {cam->t_trans.translate(0.0f, 0.0f, -0.1f); });
-    input_mgr->link(GLFW_KEY_S, "", [&cam]() {cam->t_trans.translate(0.0f, 0.0f, 0.1f); });
-    input_mgr->link(GLFW_KEY_A, "", [&cam]() {cam->t_trans.translate(-0.1f, 0.0f, 0.0f); });
-    input_mgr->link(GLFW_KEY_D, "", [&cam]() {cam->t_trans.translate(0.1f, 0.0f, 0.0f); });
-    input_mgr->link(GLFW_KEY_LEFT, "", [&cam]() {cam->t_trans.rotate(0.0f, 0.6f, 0.0f); });
-    input_mgr->link(GLFW_KEY_RIGHT, "", [&cam]() {cam->t_trans.rotate(0.0f, -0.6f, 0.0f); });
-    input_mgr->link(GLFW_KEY_E, "", [&elm]() {elm->t_trans.translate(0.1f, 0.0f, 0.0f); elm->update(); });
+    input_mgr->link(GLFW_KEY_W, "", [&cam]() {cam->move(0.2f, 0.0f);});
+    input_mgr->link(GLFW_KEY_S, "", [&cam]() {cam->move(-0.2f, 0.0f);});
+    input_mgr->link(GLFW_KEY_A, "", [&cam]() {cam->move(0.0f, -0.2f);});
+    input_mgr->link(GLFW_KEY_D, "", [&cam]() {cam->move(0.0f, 0.2f);});
+    input_mgr->link(GLFW_KEY_LEFT, "", [&cam]() {cam->turn(0.6f, 0.0f);});
+    input_mgr->link(GLFW_KEY_RIGHT, "", [&cam]() {cam->turn(-0.6f, 0.0f);});
+    input_mgr->link(GLFW_KEY_UP, "", [&cam]() {cam->turn(0.0f, 0.6f);});
+    input_mgr->link(GLFW_KEY_DOWN, "", [&cam]() {cam->turn(0.0f, -0.6f);});
 
     glfwSetWindowUserPointer(window, input_mgr);
 
@@ -146,7 +148,7 @@ int main()
 
         end = std::clock();
         auto duration = (float)(end - start) / CLOCKS_PER_SEC;
-        //std::cout << "frame rate: " << 1.0f / duration << "  drawcall time: " << scn->t_render.t_drawcall << std::endl;
+        // LOG_DEFAULT("frame rate: %f  drawcall time: %d\n", 1.0f / duration, scn->t_render.t_drawcall);
     }
 
     glfwTerminate();

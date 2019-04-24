@@ -1,3 +1,4 @@
+#include "interaction/log.h"
 #include "texture.h"
 
 namespace ace
@@ -20,7 +21,7 @@ namespace ace
             }
             else
             {
-                std::cout << "Failed to load texture: " << filename << std::endl;
+                LOG_DEFAULT("Failed to load texture: %s\n", filename);
             }
             stbi_image_free(data);
         }

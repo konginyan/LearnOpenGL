@@ -9,7 +9,7 @@ namespace ace
         {
             auto cam = new ace::runtime::camera();
             cam->setPersProj(45.0f, 800.0f, 600.0f, 0.1f, 100.0f);
-            cam->t_trans.translate(0.0f, 0.0f, 3.0f);
+            cam->move(-3.0f, 0.0f);
             t_cameras["main"] = cam;
             setActiveCamera("main");
         }
@@ -180,10 +180,10 @@ namespace ace
                     auto shad = mgr->getShad(b.shad);
                     shad->use();
 
-                    // ¹âÕÕ shader ²ÎÊý
+                    // ï¿½ï¿½ï¿½ï¿½ shader ï¿½ï¿½ï¿½ï¿½
                     if (shad->t_option.LIGHT)
                     {
-                        shad->setUniform("viewPos", ace::render::m3fv, glm::value_ptr(t_scn->getActiveCamera()->t_trans.getPosition()));
+                        shad->setUniform("viewPos", ace::render::m3fv, glm::value_ptr(t_scn->getActiveCamera()->getPosition()));
                         for (auto &lig : t_scn->t_lights)
                         {
                             for (auto &uf: lig.second->t_light_uniforms)
@@ -193,7 +193,7 @@ namespace ace
                         }
                     }
 
-                    // ÎïÌå shader ²ÎÊý
+                    // ï¿½ï¿½ï¿½ï¿½ shader ï¿½ï¿½ï¿½ï¿½
                     for (auto &uf : elm->t_uniforms)
                     {
                         shad->setUniform(uf.first, uf.second.utype, uf.second.values);

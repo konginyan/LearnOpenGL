@@ -1,4 +1,5 @@
 #include "vertex.h"
+#include "interaction/log.h"
 
 namespace ace
 {
@@ -70,7 +71,7 @@ namespace ace
         {
             if(t_buf_size + size > t_buf_capcity)
             {
-                std::cout << "VBO Overflow!!" << std::endl;
+                LOG_DEFAULT("VBO Overflow!!\n");
                 return -1;
             }
             glBindVertexArray(t_vao);
@@ -117,7 +118,7 @@ namespace ace
             int cnt = vertexDataSize(attr_type);
             if(t_attr_len + cnt > t_per_size)
             {
-                std::cout << "set attribute error: vertexArray size overflow!" << std::endl;
+                LOG_DEFAULT("set attribute error: vertexArray size overflow!\n");
                 return false;
             }
 

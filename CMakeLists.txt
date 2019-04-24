@@ -9,7 +9,8 @@ include_directories(./include)
 include_directories(./src)
 
 find_library(GLFW glfw3 ./lib NO_DEFAULT_PATH)
+find_library(ASSIMP assimp ./lib NO_DEFAULT_PATH)
 
-link_libraries(${GLFW})
+link_libraries(${GLFW} ${ASSIMP})
 
 add_subdirectory(./src)

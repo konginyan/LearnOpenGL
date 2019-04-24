@@ -1,5 +1,6 @@
 #include <string>
 #include "shader.h"
+#include "interaction/log.h"
 #include "utils/fileUtils.h"
 
 namespace ace
@@ -24,7 +25,7 @@ namespace ace
             if(!t_succeed)
             {
                 glGetShaderInfoLog(t_shader_id, 512, NULL, infoLog);
-                std::cout << "error on loading shader: " << infoLog << std::endl;
+                LOG_DEFAULT("error on loading shader: %s\n", infoLog);
             }
         }
 
@@ -91,7 +92,7 @@ namespace ace
             glGetProgramiv(t_program_id, GL_LINK_STATUS, &t_succeed);
             if(!t_succeed) {
                 glGetProgramInfoLog(t_program_id, 512, NULL, infoLog);
-                std::cout << "error on linking shader: " << infoLog << std::endl;
+                LOG_DEFAULT("error on linking shader: %s\n", infoLog);
             }
         }
 
