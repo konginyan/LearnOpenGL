@@ -1,4 +1,3 @@
-#include <string>
 #include "shader.h"
 #include "interaction/log.h"
 #include "utils/fileUtils.h"
@@ -7,102 +6,100 @@ namespace ace
 {
     namespace render
     {
-        // ----------- shader -------------
-        shader::shader(char* path, int type, shaderOption option):t_type(type)
+        shader::shader()
         {
-            std::string file_str = ace::utils::readFile(path);
-            int first_line_end = file_str.find_first_of("\n");
-            std::string options = option2macro(option);
-            file_str.insert(first_line_end + 1, options);
-            const char* src_str = file_str.c_str();
+        }
 
-            t_shader_id = glCreateShader(type);
-            glShaderSource(t_shader_id, 1, &src_str, NULL);
-            glCompileShader(t_shader_id);
-
-            char infoLog[512];
-            glGetShaderiv(t_shader_id, GL_COMPILE_STATUS, &t_succeed);
-            if(!t_succeed)
-            {
-                glGetShaderInfoLog(t_shader_id, 512, NULL, infoLog);
-                LOG_DEFAULT("error on loading shader: %s\n", infoLog);
-            }
+        shader::shader(char* vert, char* frag):t_linked(false)
+        {
+            t_vert_str = ace::utils::readFile(vert);
+            t_vert_id = glCreateShader(GL_VERTEX_SHADER);
+            t_frag_str = ace::utils::readFile(frag);
+            t_frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+            t_program_id = glCreateProgram();
         }
 
         shader::shader(const shader &s)
         {
-            t_shader_id = s.t_shader_id;
-            t_succeed = s.t_succeed;
+            t_vert_id = s.t_vert_id;
+            t_frag_id = s.t_frag_id;
+            t_program_id = s.t_program_id;
+            t_linked = s.t_linked;
         }
 
         shader::~shader()
         {
-            glDeleteShader(t_shader_id);
+            glDeleteShader(t_vert_id);
+            glDeleteShader(t_frag_id);
+            glDeleteProgram(t_program_id);
         }
 
-        int shader::is_loaded()
+        void shader::setMarco(char* marco)
         {
-            return t_succeed;
+            if(t_linked) {
+                LOG_DEFAULT("error on set shader marco: cannot set marco on a linked shader!");
+                return;
+            }
+
+            auto def = std::string("#define ");
+
+            int first_line_end = t_vert_str.find_first_of("\n");
+            t_vert_str.insert(first_line_end + 1, def + marco + "\n");
+
+            first_line_end = t_frag_str.find_first_of("\n");
+            t_frag_str.insert(first_line_end + 1, def + marco + "\n");
         }
 
-        // ----------- shaderProgram -------------
-        shaderProgram::shaderProgram()
+        void shader::compileAndLink()
         {
-        }
+            const char* v_src_str = t_vert_str.c_str();
+            glShaderSource(t_vert_id, 1, &v_src_str, NULL);
 
-        shaderProgram::shaderProgram(shader vert, shader frag)
-        {
-            t_vert_id = vert.id();
-            t_frag_id = frag.id();
-            t_program_id = glCreateProgram();
-            linkShader();
-        }
+            const char* f_src_str = t_frag_str.c_str();
+            glShaderSource(t_frag_id, 1, &f_src_str, NULL);
 
-        shaderProgram::shaderProgram(char* vert, char* frag, shaderOption option)
-        {
-            shader vshader(vert, GL_VERTEX_SHADER, option);
-            shader fshader(frag, GL_FRAGMENT_SHADER, option);
-            t_vert_id = vshader.id();
-            t_frag_id = fshader.id();
-            t_program_id = glCreateProgram();
-            t_option = option;
-            linkShader();
-        }
+            glCompileShader(t_vert_id);
 
-        shaderProgram::shaderProgram(const shaderProgram &s)
-        {
-            t_vert_id = s.t_vert_id;
-            t_frag_id = s.t_frag_id;
-            t_program_id = s.t_program_id;
-            t_succeed = s.t_succeed;
-            t_option = s.t_option;
-        }
+            char infoLog[512];
+            int flag;
+            glGetShaderiv(t_vert_id, GL_COMPILE_STATUS, &flag);
+            if(!flag)
+            {
+                glGetShaderInfoLog(t_vert_id, 512, NULL, infoLog);
+                LOG_DEFAULT("error on loading shader: %s\n", infoLog);
+                return;
+            }
 
-        shaderProgram::~shaderProgram()
-        {
-        }
+            glCompileShader(t_frag_id);
 
-        void shaderProgram::linkShader()
-        {
+            glGetShaderiv(t_frag_id, GL_COMPILE_STATUS, &flag);
+            if(!flag)
+            {
+                glGetShaderInfoLog(t_frag_id, 512, NULL, infoLog);
+                LOG_DEFAULT("error on loading shader: %s\n", infoLog);
+                return;
+            }
+
             glAttachShader(t_program_id, t_vert_id);
             glAttachShader(t_program_id, t_frag_id);
             glLinkProgram(t_program_id);
 
-            char infoLog[512];
-            glGetProgramiv(t_program_id, GL_LINK_STATUS, &t_succeed);
-            if(!t_succeed) {
+            glGetProgramiv(t_program_id, GL_LINK_STATUS, &flag);
+            if(!flag) {
                 glGetProgramInfoLog(t_program_id, 512, NULL, infoLog);
                 LOG_DEFAULT("error on linking shader: %s\n", infoLog);
+                return;
             }
+
+            t_linked = true;
         }
 
-        int shaderProgram::isLoaded()
+        void shader::use()
         {
-            return t_succeed;
-        }
-
-        void shaderProgram::use()
-        {
+            if(!t_linked) {
+                LOG_DEFAULT("error on use shader: the shader should be linked first!");
+                return;
+            }
             glUseProgram(t_program_id);
         }
     }

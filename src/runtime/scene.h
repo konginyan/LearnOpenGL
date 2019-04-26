@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include "camera.h"
-#include "render/manager.h"
+#include "manager.h"
 
 namespace ace
 {
@@ -13,39 +13,19 @@ namespace ace
         class light;
         enum lightType;
 
-        class renderer
-        {
-        private:
-            std::unordered_map<std::string, int> t_batches;
-            scene* t_scn;
-
-        public:
-            bool t_isbatch;
-            int t_drawcall;
-
-        public:
-            renderer(scene* scn);
-            ~renderer();
-
-            void makeBatch();
-            void onRenderBegin();
-            void render();
-            void onRenderEnd();
-        };
-
         class scene
         {
         private:
+            GLuint t_id;
             std::unordered_map<std::string, camera*> t_cameras;
             std::string t_active_camera;
 
         public:
             std::unordered_map<std::string, element*> t_elements;
             std::unordered_map<std::string, light*> t_lights;
-            renderer t_render;
 
         public:
-            scene();
+            scene(GLuint id);
             scene(const scene &scn) = delete;
             ~scene();
 
@@ -56,8 +36,7 @@ namespace ace
             camera* getActiveCamera();
             element* operator[](std::string name);
 
-            void update();
-            void render();
+            inline GLuint id() {return t_id;}
         };
     }
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include <sstream>
+#include <string>
 #include "glSupport.h"
 
 #define DEFINE_UNIFORM_FLOAT(type) \
@@ -25,8 +25,6 @@
 
 #define UNIFORM_SET(type, name, value) setUnifor##type(name, value)
 
-#define MARCOIZE(option) "#define " #option
-
 namespace ace
 {
     namespace render
@@ -41,76 +39,26 @@ namespace ace
             m1i
         };
 
-        struct shaderOption
-        {
-            bool COLOR;
-            bool MATERIAL;
-            bool TEXTURE;
-            bool NORMAL;
-
-            bool LIGHT;
-            int L_DIRECTION;
-            int L_POINT;
-            int L_SPOT;
-
-            bool CAST_SHADOW;
-            bool RECV_SHADOW;
-        };
-        static shaderOption default_shader_option = {false, false, false, false, false, 0, 0, 0, false, false};
-
-        static std::string option2macro(shaderOption option)
-        {
-            std::ostringstream marcos;
-            if(option.COLOR) marcos << MARCOIZE(COLOR) << "\n";
-            if(option.TEXTURE) marcos << MARCOIZE(TEXTURE) << "\n";
-            if(option.NORMAL) marcos << MARCOIZE(NORMAL) << "\n";
-            if(option.LIGHT) marcos << MARCOIZE(LIGHT) << "\n";
-            if(option.CAST_SHADOW) marcos << MARCOIZE(CAST_SHADOW) << "\n";
-            if(option.RECV_SHADOW) marcos << MARCOIZE(RECV_SHADOW) << "\n";
-
-            marcos << MARCOIZE(L_DIRECTION) << " " << option.L_DIRECTION << "\n";
-            marcos << MARCOIZE(L_POINT) << " " << option.L_POINT << "\n";
-            marcos << MARCOIZE(L_SPOT) << " " << option.L_SPOT << "\n";
-            return marcos.str();
-        }
-
         class shader
-        {
-        private:
-            GLuint t_shader_id;
-            int t_succeed;
-            int t_type;
-
-        public:
-            shader(char* path, int type, shaderOption option=default_shader_option);
-            shader(const shader &s);
-            ~shader();
-
-            int is_loaded();
-
-            inline GLuint id() {return t_shader_id;}
-        };
-
-        class shaderProgram
         {
         private:
             GLuint t_program_id;
             GLuint t_vert_id;
             GLuint t_frag_id;
-            int t_succeed;
-           
-        public:
-            shaderOption t_option;
+            std::string t_vert_str;
+            std::string t_frag_str;
 
         public:
-            shaderProgram();
-            shaderProgram(shader vert, shader frag);
-            shaderProgram(char* vert, char* frag, shaderOption option=default_shader_option);
-            shaderProgram(const shaderProgram &s);
-            ~shaderProgram();
+            bool t_linked;
 
-            void linkShader();
-            int isLoaded();
+        public:
+            shader();
+            shader(char* vert, char* frag);
+            shader(const shader &s);
+            ~shader();
+
+            void setMarco(char* marco);
+            void compileAndLink();
             void use();
 
             inline GLuint id() {return t_program_id;}

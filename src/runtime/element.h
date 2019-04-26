@@ -22,10 +22,11 @@ namespace ace
 
         public:
             ace::render::transform t_trans;
-            ace::render::batch t_bat;
+            ace::render::vertex t_vert;
+            material t_matl;
+            std::string t_pass_key;
 
             float* t_vertices;
-            float* t_real_vertices;
             int t_vert_size;
             int* t_indices;
             int t_idx_size;
@@ -38,10 +39,6 @@ namespace ace
             ~element();
 
             void setUniform(char* name, ace::render::uniformType utype, const float* val);
-            float* getVertices();
-
-            virtual void update() = 0;
-            virtual void render() = 0;
         };
     }
 }

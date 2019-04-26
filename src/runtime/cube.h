@@ -11,9 +11,6 @@ namespace ace
             cube(scene* scn, float length, float width, float height);
             cube(const cube &elm) = delete;
             ~cube();
-
-            void update();
-            void render();
         };
     }
 }

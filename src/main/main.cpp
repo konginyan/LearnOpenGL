@@ -1,11 +1,10 @@
 #include <ctime>
 #include "interaction/player.h"
 #include "interaction/log.h"
-#include "runtime/scene.h"
-#include "runtime/trangle.h"
 #include "runtime/cube.h"
 #include "runtime/light.h"
 #include "runtime/camera.h"
+#include "runtime/pipeline.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -43,71 +42,52 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     ///////////////////////// shader ///////////////////////////////
-    ace::render::shaderOption options = ace::render::default_shader_option;
-    options.TEXTURE = true;
-    auto base_shader = ace::render::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs", options);
-
-    options = ace::render::default_shader_option;
-    options.COLOR = true;
-    auto color_shader = ace::render::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs", options);
-
-    options = ace::render::default_shader_option;
-    auto empty_shader = ace::render::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs", options);
-
-    options = ace::render::default_shader_option;
-    options.LIGHT = true;
-    options.NORMAL = true;
-    options.L_DIRECTION = 1;
-    auto light_shader = ace::render::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs", options);
+    auto lightmap_shader = ace::runtime::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs");
+    lightmap_shader->setMarco("L_DIRECTION 1");
+    lightmap_shader->setMarco("L_POINT 0");
+    lightmap_shader->setMarco("L_SPOT 0");
 
     ////////////////////////// texture ///////////////////////////
-    auto wall_texture = ace::render::manager::instance()->genTex("../../../res/wall.jpg");
-    ace::render::manager::instance()->getTex(wall_texture)->bind(GL_TEXTURE0);
-    auto wood_texture = ace::render::manager::instance()->genTex("../../../res/wood.png");
-    ace::render::manager::instance()->getTex(wood_texture)->bind(GL_TEXTURE1);
-    auto metal_texture = ace::render::manager::instance()->genTex("../../../res/metal.png");
-    ace::render::manager::instance()->getTex(metal_texture)->bind(GL_TEXTURE2);
+    auto wall_texture = ace::runtime::manager::instance()->genTex("../../../res/wall.jpg");
+    auto wood_texture = ace::runtime::manager::instance()->genTex("../../../res/wood.png");
+    auto metal_texture = ace::runtime::manager::instance()->genTex("../../../res/metal.png");
 
-    ////////////////////////// scene ////////////////////////////
-    auto scn = new ace::runtime::scene();
-    scn->t_render.t_isbatch = false;
+    ////////////////////////// pass ///////////////////////////////
+    auto ple = ace::runtime::pipeline::instance();
+    auto ps = ple->genPass(ace::runtime::passType::FORWARD);
 
-    //ace::render::vec3 p1 = { -0.5f, -0.5f, 0.0f };
-    //ace::render::vec3 p2 = { 0.5f, -0.5f, 0.0f };
-    //ace::render::vec3 p3 = { 0.0f, 0.5f, 0.0f };
-    //ace::runtime::element* elm;
-    //char elm_name[30000];
-    //for (int i = 0; i < 30000; i++)
-    //{
-    //    elm = new ace::runtime::trangle(scn, p1, p2, p3);
-    //    elm->t_bat.shad = base_shader;
-    //    elm->t_bat.tex = wall_texture;
-    //    sprintf(elm_name, "t%d", i);
-    //    scn->addElement(elm_name, elm);
-    //}
-    //scn->t_render.makeBatch();
+    ///////////////////////// scene ///////////////////////////
+    auto scn = ple->appendScene();
+    auto cam = scn->getActiveCamera();
+    auto view_mat = cam->getViewMat();
+    auto proj_mat = cam->getProj();
+    ps->setUniform("view", ace::render::uniformType::mMatrix4fv, glm::value_ptr(view_mat));
+    ps->setUniform("projection", ace::render::uniformType::mMatrix4fv, glm::value_ptr(proj_mat));
 
+    ///////////////////////// light ///////////////////////////
     ace::render::vec3 amb = { 0.2f, 0.2f, 0.2f };
     ace::render::vec3 dif = { 0.5f, 0.5f, 0.5f };
     ace::render::vec3 spc = { 1.0f, 1.0f, 1.0f };
     float shine[] = { 0.1f };
     auto lig = scn->addLight("light", ace::runtime::lightType::DIRECT);
-    lig->t_bat.shad = empty_shader;
     lig->setLightUniform("dirLight[0].direction", ace::render::m3fv, ace::render::float2array(-0.8f, 0.0f, -0.3f));
     lig->setLightUniform("dirLight[0].ambient", ace::render::m3fv, ace::render::float2array(0.3f, 0.3f, 0.3f));
     lig->setLightUniform("dirLight[0].diffuse", ace::render::m3fv, ace::render::float2array(0.8f, 0.8f, 0.8f));
     lig->setLightUniform("dirLight[0].specular", ace::render::m3fv, ace::render::float2array(0.8f, 0.8f, 0.8f));
     lig->t_trans.translate(1.0f, 0.0f, 0.0f);
-    lig->update();
 
+    ///////////////////////// element ///////////////////////////
     auto elm = new ace::runtime::cube(scn, 0.5f, 0.5f, 0.5f);
-    elm->t_bat.shad = light_shader;
+    elm->t_matl.shad = lightmap_shader->id();
+    elm->t_matl.tex0 = wall_texture->id();
+    elm->t_matl.tex1 = wood_texture->id();
+    elm->t_matl.tex2 = metal_texture->id();
     elm->setUniform("material.diffuse", ace::render::m1i, ace::render::float2array(1.0f));
     elm->setUniform("material.specular", ace::render::m1i, ace::render::float2array(2.0f));
     elm->setUniform("material.shininess", ace::render::m1f, ace::render::float2array(32.0f));
-    scn->addElement("ccc", elm);
+    scn->addElement("box", elm);
 
-    auto cam = scn->getActiveCamera();
+    ////////////////////// input ////////////////////////////////////
     auto input_mgr = new ace::interaction::playerInput();
     input_mgr->link(GLFW_KEY_ESCAPE, "", [&window](){glfwSetWindowShouldClose(window, true);});
     input_mgr->link(GLFW_KEY_W, "", [&cam]() {cam->move(0.2f, 0.0f);});
@@ -131,6 +111,7 @@ int main()
 
     std::clock_t start, end;
 
+    //////////////// main loop /////////////////
     while(!glfwWindowShouldClose(window))
     {
         start = std::clock();
@@ -139,8 +120,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //scn->update();
-        scn->render();
+        ple->render();
 
         // 交互前后帧（双缓冲）
         glfwSwapBuffers(window);

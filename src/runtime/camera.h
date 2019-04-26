@@ -9,11 +9,13 @@ namespace ace
         {
         private:
             ace::render::projection t_proj;
-            ace::render::transform t_trans;
             glm::vec3 t_up;
             glm::vec3 t_right;
             float t_up_angle;
             float t_right_angle;
+
+        public:
+            ace::render::transform t_trans;
 
         public:
             camera();

@@ -11,7 +11,6 @@ LIGHT, COLOR, TEXTURE 互相冲突
 L_DIRECTION, L_POINT, L_SPOT: 光源的数量
 */
 
-#ifdef LIGHT
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -69,69 +68,43 @@ uniform SpotLight spotLight[L_SPOT];
 
 uniform vec3 viewPos; // 相机世界坐标
 in vec2 TexCoords;
-#endif
 
-#ifdef COLOR
 uniform vec4 objColor;
-#endif
 
-#ifdef NORMAL
 in vec3 Normal; // 法线向量基于世界坐标
-#endif
 
-#ifdef TEXTURE
-uniform sampler2D texture1;
-in vec2 TexCoords;
-#endif
-
-#ifdef LIGHT
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-#endif
 
 void main()
 {
-    #ifdef LIGHT
-        vec3 norm = normalize(Normal);
-        vec3 viewDir = normalize(viewPos - FragPos); // 观察方向
-        vec3 result = vec3(0.0, 0.0, 0.0);
+    vec3 norm = normalize(Normal);
+    vec3 viewDir = normalize(viewPos - FragPos); // 观察方向
+    vec3 result = vec3(0.0, 0.0, 0.0);
 
-        #if L_DIRECTION > 0
-            // phase 1: directional lighting
-            for(int i = 0; i < L_DIRECTION; i++)
-                result += CalcDirLight(dirLight[i], norm, viewDir);
-        #endif
-
-        #if L_POINT > 0
-        // phase 2: point lights
-        for(int i = 0; i < L_POINT; i++)
-            result += CalcPointLight(pointLight[i], norm, FragPos, viewDir);
-        #endif
-
-        #if L_SPOT > 0
-        // phase 3: spot light
-        for(int i = 0; i < L_SPOT; i++)
-            result += CalcSpotLight(spotLight[i], norm, FragPos, viewDir);
-        #endif
-
-        FragColor = vec4(result, 1.0);
-    #else // LIGHT
-
-        #ifdef COLOR
-            FragColor = objColor;
-        #else // COLOR
-            #ifdef TEXTURE
-                FragColor = vec4(texture(texture1, TexCoords).rgba);
-            #else // TEXTURE
-                FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            #endif
-        #endif
+    #if L_DIRECTION > 0
+        // phase 1: directional lighting
+        for(int i = 0; i < L_DIRECTION; i++)
+            result += CalcDirLight(dirLight[i], norm, viewDir);
     #endif
+
+    #if L_POINT > 0
+    // phase 2: point lights
+    for(int i = 0; i < L_POINT; i++)
+        result += CalcPointLight(pointLight[i], norm, FragPos, viewDir);
+    #endif
+
+    #if L_SPOT > 0
+    // phase 3: spot light
+    for(int i = 0; i < L_SPOT; i++)
+        result += CalcSpotLight(spotLight[i], norm, FragPos, viewDir);
+    #endif
+
+    FragColor = vec4(result, 1.0);
 }
 
-#ifdef LIGHT
 // calculates the color when using a directional light.
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
@@ -195,4 +168,3 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }
-#endif
