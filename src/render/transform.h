@@ -31,7 +31,7 @@ namespace ace
             glm::vec3 getPosition();
             glm::vec3 getRotation();
             glm::vec3 getScale();
-            glm::mat4 getTransform();
+            glm::mat4 getModelMat();
             void setPosition(float x, float y, float z);
             void setRotation(float pitch, float yaw, float roll);
             void setScale(float x, float y, float z);

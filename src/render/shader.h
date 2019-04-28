@@ -54,7 +54,7 @@ namespace ace
         public:
             shader();
             shader(char* vert, char* frag);
-            shader(const shader &s);
+            shader(const shader &s) = delete;
             ~shader();
 
             void setMarco(char* marco);
@@ -88,6 +88,9 @@ namespace ace
                     break;
                 case m1f:
                     UNIFORM_SET(m1f, name, value);
+                    break;
+                case m1i:
+                    UNIFORM_SET(m1i, name, value);
                     break;
                 default:
                     break;

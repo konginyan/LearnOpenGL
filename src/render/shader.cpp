@@ -19,14 +19,6 @@ namespace ace
             t_program_id = glCreateProgram();
         }
 
-        shader::shader(const shader &s)
-        {
-            t_vert_id = s.t_vert_id;
-            t_frag_id = s.t_frag_id;
-            t_program_id = s.t_program_id;
-            t_linked = s.t_linked;
-        }
-
         shader::~shader()
         {
             glDeleteShader(t_vert_id);

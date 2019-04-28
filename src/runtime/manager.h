@@ -34,6 +34,10 @@ namespace ace
 
         class manager
         {
+        private:
+            int t_matl_cnt;
+            int t_bat_cnt;
+
         public:
             std::unordered_map<GLuint, std::vector<ace::render::vertex*>> t_verts;
             std::unordered_map<GLuint, ace::render::shader*> t_shads;
@@ -56,10 +60,12 @@ namespace ace
             GLuint genVert(GLuint idx);
             ace::render::shader* genShad(char* vert, char* frag);
             ace::render::texture* genTex(char* filename);
+            material* genMaterial();
             ace::render::vertex* getVert(GLuint idx, GLuint part) {return t_verts[idx][part];}
             int getVertCount(GLuint idx) { return t_verts[idx].size() - 1; }
             ace::render::shader* getShad(GLuint idx) {return t_shads[idx];}
             ace::render::texture* getTex(GLuint idx) {return t_texs[idx];}
+            material* getMaterial(GLuint idx) {return t_matls[idx];}
 
             void clearVert();
 

@@ -8,7 +8,7 @@ namespace ace
         class cube: public element
         {
         public:
-            cube(scene* scn, float length, float width, float height);
+            cube(scene* scn, GLuint matl);
             cube(const cube &elm) = delete;
             ~cube();
         };

@@ -41,6 +41,14 @@ namespace ace
                 if(!t_scene) return;
                 auto mgr = manager::instance();
 
+                // view and projection
+                auto cam = t_scene->getActiveCamera();
+                auto view_mat = cam->getViewMat();
+                auto proj_mat = cam->getProj();
+                setUniform("view", ace::render::uniformType::mMatrix4fv, glm::value_ptr(view_mat));
+                setUniform("projection", ace::render::uniformType::mMatrix4fv, glm::value_ptr(proj_mat));
+                setUniform("viewPos", ace::render::uniformType::m3fv, glm::value_ptr(cam->getPosition()));
+
                 // 遍历符合key的物体
                 for (auto &e : t_scene->t_elements)
                 {
@@ -48,19 +56,24 @@ namespace ace
                     if(elm->t_pass_key != t_pass_filter) continue;
 
                     // 使用 shader
-                    material matl = elm->t_matl;
-                    material* pi = &matl;
-                    auto shad = mgr->getShad(*((GLuint*)pi));
+                    auto matl = mgr->getMaterial(elm->t_matl);
+                    auto shad = mgr->getShad(matl->shad);
                     shad->use();
-                    pi += sizeof(GLuint);
 
                     // 贴图
-                    for (int i=0; i<8; i++)
+                    if (matl->tex0 > 0) mgr->getTex(matl->tex0)->bind(GL_TEXTURE0);
+                    if (matl->tex1 > 0) mgr->getTex(matl->tex1)->bind(GL_TEXTURE1);
+                    if (matl->tex2 > 0) mgr->getTex(matl->tex2)->bind(GL_TEXTURE2);
+                    if (matl->tex3 > 0) mgr->getTex(matl->tex3)->bind(GL_TEXTURE3);
+                    if (matl->tex4 > 0) mgr->getTex(matl->tex4)->bind(GL_TEXTURE4);
+                    if (matl->tex5 > 0) mgr->getTex(matl->tex5)->bind(GL_TEXTURE5);
+                    if (matl->tex6 > 0) mgr->getTex(matl->tex6)->bind(GL_TEXTURE6);
+                    if (matl->tex7 > 0) mgr->getTex(matl->tex7)->bind(GL_TEXTURE7);
+
+                    // element uniform
+                    for (auto &uf: elm->t_uniforms)
                     {
-                        if(*((GLuint*)pi) > 0) {
-                            mgr->getTex(*((GLuint*)pi))->bind(GL_TEXTURE0 + i);
-                        }
-                        pi += sizeof(GLuint);
+                        shad->setUniform(uf.first, uf.second.utype, uf.second.values);
                     }
 
                     // 获取光源 uniform
@@ -73,22 +86,25 @@ namespace ace
                         }
                     }
 
-                    // pass 通用 uniform
+                    // pass uniform
                     for (auto &uf: t_uniforms)
                     {
                         shad->setUniform(uf.first, uf.second.utype, uf.second.values);
                     }
 
+                    // model 矩阵 uniform
+                    elm->setModelUniform();
+
                     // 逐个画出三角形
                     auto v = elm->t_vert;
-                    v.bind();
+                    v->bind();
                     if (elm->t_idx_size > 0)
                     {
-                        glDrawElements(GL_TRIANGLES, v.drawElementCount(), GL_UNSIGNED_INT, 0);
+                        glDrawElements(GL_TRIANGLES, v->drawElementCount(), GL_UNSIGNED_INT, 0);
                     }
                     else
                     {
-                        glDrawArrays(GL_TRIANGLES, 0, v.drawArrayCount());
+                        glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
                     }
                 }
             }

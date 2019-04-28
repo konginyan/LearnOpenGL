@@ -31,14 +31,10 @@ namespace ace
             glActiveTexture(idx);
             glBindTexture(GL_TEXTURE_2D, t_id);
         }
-
-        texture::texture(const texture &tex)
-        {
-            t_id = tex.t_id;
-        }
         
         texture::~texture()
         {
+            glDeleteTextures(1, &t_id);
         }
     }
 }

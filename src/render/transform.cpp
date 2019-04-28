@@ -62,10 +62,10 @@ namespace ace
         }
 
         // 获取完全的变换矩阵
-        glm::mat4 transform::getTransform()
+        glm::mat4 transform::getModelMat()
         {
             glm::mat4 rotate = glm::mat4_cast(t_rotation);
-            return t_scale * t_position * rotate;
+            return t_scale * rotate * t_position;
         }
 
         // 重置位移矩阵

@@ -1,15 +1,5 @@
 #version 330 core
 out vec4 FragColor;
-in vec3 FragPos; // 着色点世界坐标
-
-/*
-LIGHT: 光照贴图
-COLOR: 物体自带颜色，不接受光照
-TEXTURE: 物体自带纹理，不接受光照
-NORMAL: 需要法线向量
-LIGHT, COLOR, TEXTURE 互相冲突
-L_DIRECTION, L_POINT, L_SPOT: 光源的数量
-*/
 
 struct Material {
     sampler2D diffuse;
@@ -67,10 +57,9 @@ uniform SpotLight spotLight[L_SPOT];
 #endif
 
 uniform vec3 viewPos; // 相机世界坐标
+
+in vec3 FragPos; // 着色点世界坐标
 in vec2 TexCoords;
-
-uniform vec4 objColor;
-
 in vec3 Normal; // 法线向量基于世界坐标
 
 // function prototypes

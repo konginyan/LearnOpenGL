@@ -16,23 +16,25 @@ namespace ace
             glGenBuffers(1, &t_ebo);
         }
 
-        vertex::vertex(const vertex &v):t_per_size(v.t_per_size), t_attr_len(0), t_buf_size(0), t_idx_size(0)
-        {
-            glGenVertexArrays(1, &t_vao);
-            glGenBuffers(1, &t_vbo);
-            glGenBuffers(1, &t_ebo);
-            for (auto &attr : v.t_attr_cnt)
-            {
-                setAttr(attr);
-            }
-            clearBuffer(v.t_buf_capcity);
-        }
-        
         vertex::~vertex()
         {
             glDeleteVertexArrays(1, &t_vao);
             glDeleteBuffers(1, &t_vbo);
             glDeleteBuffers(1, &t_ebo);
+        }
+
+        void vertex::copyAttr(vertex &v)
+        {
+            if(t_attr_cnt.size() > 0) {
+                LOG_DEFAULT("vertex unit has already set attr, please clear first!");
+                return;
+            }
+
+            t_per_size = v.t_per_size;
+            for (auto &attr : v.t_attr_cnt)
+            {
+                setAttr(attr);
+            }
         }
 
         bool vertex::setPerSize(int size)

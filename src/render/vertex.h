@@ -6,17 +6,6 @@ namespace ace
 {
     namespace render
     {
-        struct vec3
-        {
-            float x, y, z;
-        };
-
-        static float* vec2array(vec3 v)
-        {
-            float* f = new float[3]{v.x, v.y, v.z};
-            return f;
-        }
-
         static float* float2array(float f1)
         {
             float* f = new float[1]{ f1 };
@@ -68,7 +57,7 @@ namespace ace
         public:
             vertex();
             vertex(int per_size);
-            vertex(const vertex &v);
+            vertex(const vertex &v) = delete;
             ~vertex();
 
             int getPerSize() { return t_per_size; }
@@ -82,6 +71,7 @@ namespace ace
 
             void setIndex(int size, int* indices); // 设置索引
             bool setAttr(vertexDataType attr_type); // 添加并设置属性大小
+            void copyAttr(vertex &v); // 复制其他 vertex 对象的属性
             void clearAttr(); // 删除所有属性
             bool bind(); // 绑定 vao
 

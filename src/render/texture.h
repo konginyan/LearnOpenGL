@@ -15,7 +15,7 @@ namespace ace
 
         public:
             texture(char* filename);
-            texture(const texture &tex);
+            texture(const texture &tex) = delete;
             ~texture();
 
             void bind(int idx);

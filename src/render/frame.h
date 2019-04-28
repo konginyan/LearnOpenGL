@@ -17,6 +17,7 @@ namespace ace
 
         public:
             frame();
+            frame(frame& f) = delete;
             ~frame();
 
             void attachTexture(GLuint tex, GLuint attach_type);

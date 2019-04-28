@@ -22,8 +22,8 @@ namespace ace
 
         public:
             ace::render::transform t_trans;
-            ace::render::vertex t_vert;
-            material t_matl;
+            ace::render::vertex* t_vert;
+            GLuint t_matl;
             std::string t_pass_key;
 
             float* t_vertices;
@@ -34,10 +34,11 @@ namespace ace
             std::unordered_map<char*, uniform> t_uniforms;
 
         public:
-            element(scene* scn);
+            element(scene* scn, GLuint matl);
             element(const element &elm) = delete;
             ~element();
 
+            void setModelUniform();
             void setUniform(char* name, ace::render::uniformType utype, const float* val);
         };
     }

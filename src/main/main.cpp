@@ -41,49 +41,47 @@ int main()
 
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
+    ///////////////////// resource manager //////////////////////////
+    auto res_mgr = ace::runtime::manager::instance();
+
     ///////////////////////// shader ///////////////////////////////
-    auto lightmap_shader = ace::runtime::manager::instance()->genShad("../../../shader/base.vs", "../../../shader/base.fs");
+    auto lightmap_shader = res_mgr->genShad("../../../shader/base.vs", "../../../shader/base.fs");
     lightmap_shader->setMarco("L_DIRECTION 1");
     lightmap_shader->setMarco("L_POINT 0");
     lightmap_shader->setMarco("L_SPOT 0");
+    lightmap_shader->compileAndLink();
 
     ////////////////////////// texture ///////////////////////////
-    auto wall_texture = ace::runtime::manager::instance()->genTex("../../../res/wall.jpg");
-    auto wood_texture = ace::runtime::manager::instance()->genTex("../../../res/wood.png");
-    auto metal_texture = ace::runtime::manager::instance()->genTex("../../../res/metal.png");
+    auto wall_texture = res_mgr->genTex("../../../res/wall.jpg");
+    auto wood_texture = res_mgr->genTex("../../../res/wood.png");
+    auto metal_texture = res_mgr->genTex("../../../res/metal.png");
 
     ////////////////////////// pass ///////////////////////////////
     auto ple = ace::runtime::pipeline::instance();
     auto ps = ple->genPass(ace::runtime::passType::FORWARD);
+    ple->appendPass(ps->id());
 
     ///////////////////////// scene ///////////////////////////
     auto scn = ple->appendScene();
     auto cam = scn->getActiveCamera();
-    auto view_mat = cam->getViewMat();
-    auto proj_mat = cam->getProj();
-    ps->setUniform("view", ace::render::uniformType::mMatrix4fv, glm::value_ptr(view_mat));
-    ps->setUniform("projection", ace::render::uniformType::mMatrix4fv, glm::value_ptr(proj_mat));
 
     ///////////////////////// light ///////////////////////////
-    ace::render::vec3 amb = { 0.2f, 0.2f, 0.2f };
-    ace::render::vec3 dif = { 0.5f, 0.5f, 0.5f };
-    ace::render::vec3 spc = { 1.0f, 1.0f, 1.0f };
-    float shine[] = { 0.1f };
     auto lig = scn->addLight("light", ace::runtime::lightType::DIRECT);
-    lig->setLightUniform("dirLight[0].direction", ace::render::m3fv, ace::render::float2array(-0.8f, 0.0f, -0.3f));
-    lig->setLightUniform("dirLight[0].ambient", ace::render::m3fv, ace::render::float2array(0.3f, 0.3f, 0.3f));
+    lig->setLightUniform("dirLight[0].direction", ace::render::m3fv, ace::render::float2array(-0.3f, -0.6f, -1.0f));
+    lig->setLightUniform("dirLight[0].ambient", ace::render::m3fv, ace::render::float2array(0.6f, 0.6f, 0.6f));
     lig->setLightUniform("dirLight[0].diffuse", ace::render::m3fv, ace::render::float2array(0.8f, 0.8f, 0.8f));
     lig->setLightUniform("dirLight[0].specular", ace::render::m3fv, ace::render::float2array(0.8f, 0.8f, 0.8f));
-    lig->t_trans.translate(1.0f, 0.0f, 0.0f);
+
+    ///////////////////////// material ////////////////////////////
+    auto box_material = res_mgr->genMaterial();
+    box_material->shad = lightmap_shader->id();
+    box_material->tex0 = wood_texture->id();
+    box_material->tex1 = metal_texture->id();
 
     ///////////////////////// element ///////////////////////////
-    auto elm = new ace::runtime::cube(scn, 0.5f, 0.5f, 0.5f);
-    elm->t_matl.shad = lightmap_shader->id();
-    elm->t_matl.tex0 = wall_texture->id();
-    elm->t_matl.tex1 = wood_texture->id();
-    elm->t_matl.tex2 = metal_texture->id();
-    elm->setUniform("material.diffuse", ace::render::m1i, ace::render::float2array(1.0f));
-    elm->setUniform("material.specular", ace::render::m1i, ace::render::float2array(2.0f));
+    auto elm = new ace::runtime::cube(scn, box_material->id);
+    elm->setUniform("material.diffuse", ace::render::m1i, ace::render::float2array(0.0f));
+    elm->setUniform("material.specular", ace::render::m1i, ace::render::float2array(1.0f));
     elm->setUniform("material.shininess", ace::render::m1f, ace::render::float2array(32.0f));
     scn->addElement("box", elm);
 
