@@ -102,10 +102,10 @@ namespace ace
 
         int vertex::drawElementCount()
         {
-            return t_idx_size / sizeof(int);
+            return t_idx_size / sizeof(unsigned int);
         }
 
-        void vertex::setIndex(int size, int* indices)
+        void vertex::setIndex(int size, unsigned int* indices)
         {
             glBindVertexArray(t_vao);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, t_ebo);

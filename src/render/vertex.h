@@ -18,16 +18,23 @@ namespace ace
             return f;
         }
 
-        enum vertexDataType {position, normal, texcoord2d};
+        enum vertexDataType 
+        {
+            position,
+            normal,
+            texcoord2d,
+            tangent,
+            bitangent
+        };
 
         static int vertexDataSize(vertexDataType option)
         {
             switch (option)
             {
                 case position:
-                    return 3;
-
                 case normal:
+                case tangent:
+                case bitangent:
                     return 3;
 
                 case texcoord2d:
@@ -69,7 +76,7 @@ namespace ace
             int drawArrayCount(); // 获取 drawArray 方法的顶点数
             int drawElementCount(); // 获取 drawElement 方法的顶点数
 
-            void setIndex(int size, int* indices); // 设置索引
+            void setIndex(int size, unsigned int* indices); // 设置索引
             bool setAttr(vertexDataType attr_type); // 添加并设置属性大小
             void copyAttr(vertex &v); // 复制其他 vertex 对象的属性
             void clearAttr(); // 删除所有属性

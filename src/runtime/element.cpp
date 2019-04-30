@@ -5,15 +5,18 @@ namespace ace
 {
     namespace runtime
     {
-        element::element(scene* scn, GLuint matl):t_scn(scn), t_vert_size(0), t_idx_size(0), t_pass_key(ALL_PASS), t_matl(matl)
+        element::element(scene* scn, GLuint matl, std::string name):t_scn(scn), t_parent(nullptr),
+            t_pass_key(ALL_PASS), t_matl(matl), t_name(name), t_vert(nullptr)
         {
         }
 
         element::~element()
         {
             delete t_vert;
-            delete t_vertices;
-            delete t_indices;
+            for(auto &elm: t_children)
+            {
+                delete elm.second;
+            }
         }
 
         void element::setModelUniform()
@@ -22,7 +25,7 @@ namespace ace
             setUniform("model", ace::render::uniformType::mMatrix4fv, val);
         }
 
-        void element::setUniform(char* name, ace::render::uniformType utype, const float* val)
+        void element::setUniform(std::string name, ace::render::uniformType utype, const float* val)
         {
             uniform uf = { utype, val };
             t_uniforms[name] = uf;

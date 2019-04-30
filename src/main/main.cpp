@@ -5,6 +5,7 @@
 #include "runtime/light.h"
 #include "runtime/camera.h"
 #include "runtime/pipeline.h"
+#include "runtime/model.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -45,11 +46,14 @@ int main()
     auto res_mgr = ace::runtime::manager::instance();
 
     ///////////////////////// shader ///////////////////////////////
-    auto lightmap_shader = res_mgr->genShad("../../../shader/base.vs", "../../../shader/base.fs");
+    auto lightmap_shader = res_mgr->genShad("../../../shader/pnt.vs", "../../../shader/forward_light.fs");
     lightmap_shader->setMarco("L_DIRECTION 1");
     lightmap_shader->setMarco("L_POINT 0");
     lightmap_shader->setMarco("L_SPOT 0");
     lightmap_shader->compileAndLink();
+
+    auto model_shader = res_mgr->genShad("../../../shader/pnt.vs", "../../../shader/model.fs");
+    model_shader->compileAndLink();
 
     ////////////////////////// texture ///////////////////////////
     auto wall_texture = res_mgr->genTex("../../../res/wall.jpg");
@@ -75,15 +79,21 @@ int main()
     ///////////////////////// material ////////////////////////////
     auto box_material = res_mgr->genMaterial();
     box_material->shad = lightmap_shader->id();
-    box_material->tex0 = wood_texture->id();
-    box_material->tex1 = metal_texture->id();
+    box_material->tex[0] = wood_texture->id();
+    box_material->tex[1] = metal_texture->id();
+
+    auto suit_material = res_mgr->genMaterial();
+    suit_material->shad = model_shader->id();
 
     ///////////////////////// element ///////////////////////////
-    auto elm = new ace::runtime::cube(scn, box_material->id);
-    elm->setUniform("material.diffuse", ace::render::m1i, ace::render::float2array(0.0f));
-    elm->setUniform("material.specular", ace::render::m1i, ace::render::float2array(1.0f));
-    elm->setUniform("material.shininess", ace::render::m1f, ace::render::float2array(32.0f));
-    scn->addElement("box", elm);
+    // auto elm = new ace::runtime::cube(scn, box_material->id, "box");
+    // elm->setUniform("material.diffuse", ace::render::m1i, ace::render::float2array(0.0f));
+    // elm->setUniform("material.specular", ace::render::m1i, ace::render::float2array(1.0f));
+    // elm->setUniform("material.shininess", ace::render::m1f, ace::render::float2array(32.0f));
+    // scn->addElement(elm);
+
+    auto mod = new ace::runtime::model(scn, suit_material->id, "suit", "../../../res/nanosuit/nanosuit.obj");
+    scn->addElement(mod);
 
     ////////////////////// input ////////////////////////////////////
     auto input_mgr = new ace::interaction::playerInput();

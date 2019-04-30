@@ -32,9 +32,9 @@ namespace ace
             }
         }
 
-        void scene::addElement(std::string name, element* elm)
+        void scene::addElement(element* elm)
         {
-            t_elements[name] = elm;
+            t_elements[elm->name()] = elm;
         }
 
         camera* scene::addCamera(std::string name)

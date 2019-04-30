@@ -6,7 +6,7 @@ namespace ace
 {
     namespace utils
     {
-        std::string readFile(char* filename)
+        std::string readFile(const char* filename)
         {
             std::ifstream t(filename);
             std::string str((std::istreambuf_iterator<char>(t)),

@@ -3,21 +3,21 @@
 #include "glSupport.h"
 
 #define DEFINE_UNIFORM_FLOAT(type) \
-    void setUnifor##type(char* name, const GLfloat* value) \
+    void setUnifor##type(const char* name, const GLfloat* value) \
     { \
         GLuint location = glGetUniformLocation(t_program_id, name); \
         glUnifor##type(location, *value); \
     }
 
 #define DEFINE_UNIFORM_VECTOR(type) \
-    void setUnifor##type(char* name, const GLfloat *value) \
+    void setUnifor##type(const char* name, const GLfloat *value) \
     { \
         GLuint location = glGetUniformLocation(t_program_id, name); \
         glUnifor##type(location, 1, value); \
     }
 
 #define DEFINE_UNIFORM_MATRIX(type) \
-    void setUnifor##type(char* name, const GLfloat *value) \
+    void setUnifor##type(const char* name, const GLfloat *value) \
     { \
         GLuint location = glGetUniformLocation(t_program_id, name); \
         glUnifor##type(location, 1, GL_FALSE, value); \
@@ -53,7 +53,7 @@ namespace ace
 
         public:
             shader();
-            shader(char* vert, char* frag);
+            shader(const char* vert, const char* frag);
             shader(const shader &s) = delete;
             ~shader();
 
@@ -70,27 +70,27 @@ namespace ace
             DEFINE_UNIFORM_FLOAT(m1f); // setUniform1f
             DEFINE_UNIFORM_FLOAT(m1i); // setUniform1i
 
-            void setUniform(char* name, uniformType utype, const float* value)
+            void setUniform(std::string name, uniformType utype, const float* value)
             {
                 switch (utype)
                 {
                 case mMatrix4fv:
-                    UNIFORM_SET(mMatrix4fv, name, value);
+                    UNIFORM_SET(mMatrix4fv, name.c_str(), value);
                     break;
                 case m2fv:
-                    UNIFORM_SET(m2fv, name, value);
+                    UNIFORM_SET(m2fv, name.c_str(), value);
                     break;
                 case m3fv:
-                    UNIFORM_SET(m3fv, name, value);
+                    UNIFORM_SET(m3fv, name.c_str(), value);
                     break;
                 case m4fv:
-                    UNIFORM_SET(m4fv, name, value);
+                    UNIFORM_SET(m4fv, name.c_str(), value);
                     break;
                 case m1f:
-                    UNIFORM_SET(m1f, name, value);
+                    UNIFORM_SET(m1f, name.c_str(), value);
                     break;
                 case m1i:
-                    UNIFORM_SET(m1i, name, value);
+                    UNIFORM_SET(m1i, name.c_str(), value);
                     break;
                 default:
                     break;

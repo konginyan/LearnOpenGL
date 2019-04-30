@@ -1,4 +1,5 @@
 #include "pipeline.h"
+#include "interaction/log.h"
 
 namespace ace
 {
@@ -28,10 +29,92 @@ namespace ace
         {
         }
 
-        void pass::setUniform(char* name, ace::render::uniformType utype, const float* val)
+        void pass::setUniform(std::string name, ace::render::uniformType utype, const float* val)
         {
             uniform uf = { utype, val };
             t_uniforms[name] = uf;
+        }
+
+        // 渲染单个 element
+        void pass::renderElement(element* elm)
+        {
+            if (!elm->t_vert) return; // 没有顶点数据跳过
+
+            auto res_mgr = manager::instance();
+
+            // 使用 shader
+            auto matl = res_mgr->getMaterial(elm->t_matl);
+
+            // 如果没有shader就使用父节点的shader
+            if(matl->shad == 0) {
+                auto parent = elm->getParent();
+                if(!parent) {
+                    LOG_DEFAULT("element lack shader while render!");
+                    return;
+                }
+                auto pmat = res_mgr->getMaterial(parent->t_matl);
+                if(pmat->shad == 0) {
+                    LOG_DEFAULT("element lack shader while render!");
+                    return;
+                }
+                matl->shad = pmat->shad;
+            }
+            auto shad = res_mgr->getShad(matl->shad);
+            shad->use();
+
+            // 贴图
+            for (unsigned int i = 0; i < 8; i++)
+            {
+                if (matl->tex[i] > 0)
+                    res_mgr->getTex(matl->tex[i])->bind(GL_TEXTURE0 + i);
+            }
+
+            // element uniform
+            for (auto &uf: elm->t_uniforms)
+            {
+                shad->setUniform(uf.first, uf.second.utype, uf.second.values);
+            }
+
+            // 获取光源 uniform
+            for (auto &lig : t_scene->t_lights)
+            {
+                if(lig.second->t_pass_key != t_pass_filter) continue;
+                for (auto &uf: lig.second->t_light_uniforms)
+                {
+                    shad->setUniform(uf.first, uf.second.utype, uf.second.values);
+                }
+            }
+
+            // pass uniform
+            for (auto &uf: t_uniforms)
+            {
+                shad->setUniform(uf.first, uf.second.utype, uf.second.values);
+            }
+
+            // model 矩阵 uniform
+            elm->setModelUniform();
+
+            // 逐个画出三角形
+            auto v = elm->t_vert;
+            v->bind();
+            if (!elm->t_indices.empty())
+            {
+                glDrawElements(GL_TRIANGLES, v->drawElementCount(), GL_UNSIGNED_INT, 0);
+            }
+            else
+            {
+                glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
+            }
+        }
+
+        // 遍历渲染所有子物体，子物体只要父物体被渲染，子物体就渲染
+        void pass::renderRecursive(element* elm)
+        {
+            renderElement(elm);
+            for(auto &e : elm->t_children)
+            {
+                renderRecursive(e.second);
+            }
         }
 
         void pass::render()
@@ -39,7 +122,6 @@ namespace ace
             if(t_type == FORWARD)
             {
                 if(!t_scene) return;
-                auto mgr = manager::instance();
 
                 // view and projection
                 auto cam = t_scene->getActiveCamera();
@@ -53,74 +135,23 @@ namespace ace
                 for (auto &e : t_scene->t_elements)
                 {
                     auto elm = e.second;
-                    if(elm->t_pass_key != t_pass_filter) continue;
-
-                    // 使用 shader
-                    auto matl = mgr->getMaterial(elm->t_matl);
-                    auto shad = mgr->getShad(matl->shad);
-                    shad->use();
-
-                    // 贴图
-                    if (matl->tex0 > 0) mgr->getTex(matl->tex0)->bind(GL_TEXTURE0);
-                    if (matl->tex1 > 0) mgr->getTex(matl->tex1)->bind(GL_TEXTURE1);
-                    if (matl->tex2 > 0) mgr->getTex(matl->tex2)->bind(GL_TEXTURE2);
-                    if (matl->tex3 > 0) mgr->getTex(matl->tex3)->bind(GL_TEXTURE3);
-                    if (matl->tex4 > 0) mgr->getTex(matl->tex4)->bind(GL_TEXTURE4);
-                    if (matl->tex5 > 0) mgr->getTex(matl->tex5)->bind(GL_TEXTURE5);
-                    if (matl->tex6 > 0) mgr->getTex(matl->tex6)->bind(GL_TEXTURE6);
-                    if (matl->tex7 > 0) mgr->getTex(matl->tex7)->bind(GL_TEXTURE7);
-
-                    // element uniform
-                    for (auto &uf: elm->t_uniforms)
-                    {
-                        shad->setUniform(uf.first, uf.second.utype, uf.second.values);
-                    }
-
-                    // 获取光源 uniform
-                    for (auto &lig : t_scene->t_lights)
-                    {
-                        if(lig.second->t_pass_key != t_pass_filter) continue;
-                        for (auto &uf: lig.second->t_light_uniforms)
-                        {
-                            shad->setUniform(uf.first, uf.second.utype, uf.second.values);
-                        }
-                    }
-
-                    // pass uniform
-                    for (auto &uf: t_uniforms)
-                    {
-                        shad->setUniform(uf.first, uf.second.utype, uf.second.values);
-                    }
-
-                    // model 矩阵 uniform
-                    elm->setModelUniform();
-
-                    // 逐个画出三角形
-                    auto v = elm->t_vert;
-                    v->bind();
-                    if (elm->t_idx_size > 0)
-                    {
-                        glDrawElements(GL_TRIANGLES, v->drawElementCount(), GL_UNSIGNED_INT, 0);
-                    }
-                    else
-                    {
-                        glDrawArrays(GL_TRIANGLES, 0, v->drawArrayCount());
-                    }
+                    if(elm->t_pass_key == t_pass_filter)
+                        renderRecursive(elm);
                 }
             }
 
             else if(t_type == POSTPROCESS)
             {
-                auto mgr = manager::instance();
+                auto res_mgr = manager::instance();
 
                 // 使用 shader
-                auto shad = mgr->getShad(t_shader);
+                auto shad = res_mgr->getShad(t_shader);
                 shad->use();
 
                 // 贴图
                 for (auto tex : t_tex_input)
                 {
-                    mgr->getTex(tex.first)->bind(GL_TEXTURE0 + tex.second);
+                    res_mgr->getTex(tex.first)->bind(GL_TEXTURE0 + tex.second);
                 }
 
                 // pass 通用 uniform

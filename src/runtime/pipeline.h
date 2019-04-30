@@ -29,15 +29,17 @@ namespace ace
             scene* t_scene;
             std::string t_pass_filter;
 
-            std::unordered_map<char*, uniform> t_uniforms;
+            std::unordered_map<std::string, uniform> t_uniforms;
             std::unordered_map<GLuint, GLuint> t_tex_idx; // 所需fbo参数格式 (attach_type, texture_index)
             std::unordered_map<GLuint, GLuint> t_tex_input; // 接受上一个pass生成的fbo (texture_id, texture_index)
 
         public:
             pass(GLuint id, passType type);
             ~pass();
-            void setUniform(char* name, ace::render::uniformType utype, const float* val);
+            void setUniform(std::string name, ace::render::uniformType utype, const float* val);
 
+            void renderElement(element* elm);
+            void renderRecursive(element* elm);
             void render();
 
             inline GLuint id() {return t_id;}
@@ -74,7 +76,6 @@ namespace ace
             ace::render::frame* genFrame();
             ace::render::frame* getFrame(GLuint id) {return t_frames[id];}
             void appendPass(GLuint id) {t_pipeline.push_back(id);}
-
             void render();
         };
     }

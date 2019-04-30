@@ -55,7 +55,7 @@ namespace ace
             return cnt;
         }
 
-        ace::render::shader* manager::genShad(char* vert, char* frag)
+        ace::render::shader* manager::genShad(const char* vert, const char* frag)
         {
             auto shad = new ace::render::shader(vert, frag);
             auto id = shad->id();
@@ -63,7 +63,7 @@ namespace ace
             return shad;
         }
 
-        ace::render::texture* manager::genTex(char* filename)
+        ace::render::texture* manager::genTex(const char* filename)
         {
             auto tex = new ace::render::texture(filename);
             auto id = tex->id();
@@ -75,14 +75,7 @@ namespace ace
         {
             auto matl = new material();
             matl->id = t_matl_cnt;
-            matl->tex0 = 0;
-            matl->tex1 = 0;
-            matl->tex2 = 0;
-            matl->tex3 = 0;
-            matl->tex4 = 0;
-            matl->tex5 = 0;
-            matl->tex6 = 0;
-            matl->tex7 = 0;
+            memset(matl->tex, 0, sizeof(matl->tex));
             t_matls[t_matl_cnt++] = matl;
             return matl;
         }
@@ -99,22 +92,12 @@ namespace ace
         {
             std::string str("");
             str.append(std::to_string(b.shad));
-            str.append("/");
-            str.append(std::to_string(b.tex0));
-            str.append("/");
-            str.append(std::to_string(b.tex1));
-            str.append("/");
-            str.append(std::to_string(b.tex2));
-            str.append("/");
-            str.append(std::to_string(b.tex3));
-            str.append("/");
-            str.append(std::to_string(b.tex4));
-            str.append("/");
-            str.append(std::to_string(b.tex5));
-            str.append("/");
-            str.append(std::to_string(b.tex6));
-            str.append("/");
-            str.append(std::to_string(b.tex7));
+            
+            for (unsigned int i = 0; i < 8; i++)
+            {
+                str.append("/");
+                str.append(std::to_string(b.tex[i]));
+            }
             return str;
         }
 
@@ -130,45 +113,13 @@ namespace ace
             num = str.substr(pos1, pos2-pos1);
             matl.shad = atoi(num.c_str());
 
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex0 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex1 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex2 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex3 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex4 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex5 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex6 = atoi(num.c_str());
-
-            pos1 = pos2 + 1;
-            pos2 = str.find("/", pos1);
-            num = str.substr(pos1, pos2-pos1);
-            matl.tex7 = atoi(num.c_str());
+            for (unsigned int i = 0; i < 8; i++)
+            {
+                pos1 = pos2 + 1;
+                pos2 = str.find("/", pos1);
+                num = str.substr(pos1, pos2-pos1);
+                matl.tex[i] = atoi(num.c_str());
+            }
 
             return matl;
         }

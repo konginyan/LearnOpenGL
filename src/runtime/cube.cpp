@@ -5,10 +5,9 @@ namespace ace
 {
     namespace runtime
     {
-        cube::cube(scene* scn, GLuint matl):element(scn, matl)
+        cube::cube(scene* scn, GLuint matl, std::string name):element(scn, matl, name)
         {
-            int vsize = 36 * 8;
-            t_vertices = new float[vsize]{
+            float vertices[36 * 8] = {
                 // positions          // normals           // texture coords
                 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
                  0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
@@ -53,13 +52,13 @@ namespace ace
                 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
             };
 
-            t_vert_size = vsize * sizeof(float);
+            t_vertices = std::vector<float>(vertices, vertices + sizeof(vertices) / sizeof(float));
 
             t_vert = new ace::render::vertex(8);
             t_vert->setAttr(ace::render::vertexDataType::position);
             t_vert->setAttr(ace::render::vertexDataType::normal);
             t_vert->setAttr(ace::render::vertexDataType::texcoord2d);
-            t_vert->setBuffer(t_vert_size, t_vertices);
+            t_vert->setBuffer(t_vertices.size() * sizeof(float), &t_vertices[0]);
 
             // auto mgr = ace::render::manager::instance();
             // auto types = new ace::render::vertexDataType[3]{

@@ -5,7 +5,7 @@ namespace ace
 {
     namespace render
     {
-        texture::texture(char* filename)
+        texture::texture(const char* filename)
         {
             glGenTextures(1, &t_id);
             int width, height, nrChannels;

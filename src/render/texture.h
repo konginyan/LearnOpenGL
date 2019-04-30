@@ -14,7 +14,7 @@ namespace ace
             GLuint t_id;
 
         public:
-            texture(char* filename);
+            texture(const char* filename);
             texture(const texture &tex) = delete;
             ~texture();
 

@@ -14,14 +14,7 @@ namespace ace
         {
             GLuint id;
             GLuint shad;
-            GLuint tex0;
-            GLuint tex1;
-            GLuint tex2;
-            GLuint tex3;
-            GLuint tex4;
-            GLuint tex5;
-            GLuint tex6;
-            GLuint tex7;
+            GLuint tex[8];
         };
 
         struct batch
@@ -58,8 +51,8 @@ namespace ace
 
             GLuint genVert(int cnt, ace::render::vertexDataType* types);
             GLuint genVert(GLuint idx);
-            ace::render::shader* genShad(char* vert, char* frag);
-            ace::render::texture* genTex(char* filename);
+            ace::render::shader* genShad(const char* vert, const char* frag);
+            ace::render::texture* genTex(const char* filename);
             material* genMaterial();
             ace::render::vertex* getVert(GLuint idx, GLuint part) {return t_verts[idx][part];}
             int getVertCount(GLuint idx) { return t_verts[idx].size() - 1; }

@@ -12,7 +12,7 @@ namespace ace
         {
         public:
             ace::render::transform t_trans;
-            std::unordered_map<char*, uniform> t_light_uniforms;
+            std::unordered_map<std::string, uniform> t_light_uniforms;
             lightType t_type;
             std::string t_pass_key;
 
@@ -21,7 +21,7 @@ namespace ace
             light(const light &elm) = delete;
             ~light();
 
-            void setLightUniform(char* name, ace::render::uniformType utype, const float* val);
+            void setLightUniform(std::string name, ace::render::uniformType utype, const float* val);
         };
     }
 }

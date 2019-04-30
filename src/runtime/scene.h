@@ -29,7 +29,7 @@ namespace ace
             scene(const scene &scn) = delete;
             ~scene();
 
-            void addElement(std::string name, element* elm);
+            void addElement(element* elm);
             camera* addCamera(std::string name);
             light* addLight(std::string name, lightType lt);
             void setActiveCamera(std::string name);

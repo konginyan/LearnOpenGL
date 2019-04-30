@@ -13,7 +13,7 @@ namespace ace
         {
         }
 
-        void light::setLightUniform(char* name, ace::render::uniformType utype, const float* val)
+        void light::setLightUniform(std::string name, ace::render::uniformType utype, const float* val)
         {
             uniform uf = { utype, val };
             t_light_uniforms[name] = uf;

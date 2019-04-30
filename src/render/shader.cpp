@@ -10,7 +10,7 @@ namespace ace
         {
         }
 
-        shader::shader(char* vert, char* frag):t_linked(false)
+        shader::shader(const char* vert, const char* frag):t_linked(false)
         {
             t_vert_str = ace::utils::readFile(vert);
             t_vert_id = glCreateShader(GL_VERTEX_SHADER);
